@@ -27,5 +27,5 @@ build-backend = "poetry.core.masonry.api"
 ignore_missing_imports = true
 
 [tool.black]
-line-length = 88
+line-length = 79
 skip-string-normalization = 1

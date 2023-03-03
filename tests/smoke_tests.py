@@ -1,4 +1,7 @@
-from hybridstablemodel.model.statespace import ContinuousLinear, ContinuousNonlinear
+from hybridstablemodel.model.statespace import (
+    ContinuousLinear,
+    ContinuousNonlinear,
+)
 from hybridstablemodel.simulator import Simulator
 from typing import List, Dict
 import utils
@@ -43,7 +46,7 @@ class TestClass:
         sim = Simulator(T=float(len(u) * step_size), step_size=step_size)
         _, time, info = sim.simulate(model=model, initial_state=x0, input=u)
 
-        assert info.success == True
+        assert info.success is True
         assert (time[2] - time[1]) - step_size < 1e-5
 
     def test_linear_model(self) -> None:
@@ -105,7 +108,7 @@ class TestClass:
         sim = Simulator(T=float(len(u) * step_size), step_size=step_size)
         _, time, info = sim.simulate(model=model, initial_state=x0, input=u)
 
-        assert info.success == True
+        assert info.success is True
         assert (time[2] - time[1]) - step_size < 1e-5
 
     def test_nonlinear_model(self) -> None:

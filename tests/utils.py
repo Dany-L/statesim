@@ -20,7 +20,12 @@ def get_linear_matrices() -> (
 
 
 def get_input() -> List[NDArray[np.float64]]:
-    return [np.array([[-1]]), np.array([[0]]), np.array([[0.4]]), np.array([[0.9]])]
+    return [
+        np.array([[-1]]),
+        np.array([[0]]),
+        np.array([[0.4]]),
+        np.array([[0.9]]),
+    ]
 
 
 def get_initial_state() -> NDArray[np.float64]:
