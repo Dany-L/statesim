@@ -14,3 +14,5 @@ dist
 .coverage
 debug
 poetry.lock
+*.mypy_cache
+*.pytest_cache
