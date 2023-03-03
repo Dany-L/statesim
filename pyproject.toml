@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "hybridstablemodel"
+version = "0.1.0"
+description = ""
+authors = ["Daniel Frank <daniel.frank@ipvs.uni-stuttgart.de>"]
+packages = [{include = "hybridstablemodel", from = "src"}]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10 <3.12"
+sympy = "^1.11.1"
+numpy = "^1.24.2"
+scipy = {version = "^1.10.1" }
+matplotlib = "^3.7.0"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.0.1"
+black = "^23.1.0"
+pytest = "^7.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 88
+skip-string-normalization = 1
