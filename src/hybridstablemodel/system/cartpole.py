@@ -1,6 +1,7 @@
 import numpy as np
 import abc
 from numpy.typing import NDArray
+from typing import Tuple
 from sympy import symbols, diff, sin, cos, sign, init_printing
 
 init_printing(use_unicode=True)
@@ -69,17 +70,19 @@ class CartPole(DynamicSystem):
         return x_dot
 
     def output_function(self, x, u):
-        return np.array([[1, 0, 0, 0]]) @ x
+        return np.array([[0, 0, 1, 0]]) @ x
 
-    def symb_lin(self, linearization_point):
+    def get_linearization(
+        self, x_bar: NDArray[np.float64]
+    ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
         # symbolic linearization evaluated at linearization point
         x1, x2, x3, x4, u = symbols('x1 x2 x3 x4 u')
 
         eval_dict = {
-            x1: linearization_point[0],
-            x2: linearization_point[1],
-            x3: linearization_point[2],
-            x4: linearization_point[3],
+            x1: x_bar[0, 0],
+            x2: x_bar[1, 0],
+            x3: x_bar[2, 0],
+            x4: x_bar[3, 0],
             u: 0,
         }
 
@@ -89,21 +92,21 @@ class CartPole(DynamicSystem):
             * (
                 (
                     -u
-                    - self.m_p * self.l * x4**2 * sin(x3)
+                    - self.m_p * self.length * x4**2 * sin(x3)
                     + self.mu_c * sign(x2)
                 )
                 / (self.m_c + self.m_p)
             )
-            - (self.mu_p * x4) / (self.m_p * self.l)
+            - (self.mu_p * x4) / (self.m_p * self.length)
         ) / (
-            self.l
+            self.length
             * (4 / 3 - (self.m_p * cos(x3) ** 2) / (self.m_c + self.m_p))
         )
         x1_dot = x2
         x2_dot = (
             u
-            + self.m_p * self.l * x4**2 * sin(x3)
-            - self.m_p * self.l * x4_dot * cos(x3)
+            + self.m_p * self.length * x4**2 * sin(x3)
+            - self.m_p * self.length * x4_dot * cos(x3)
             - self.mu_c * sign(x2)
         ) / (self.m_c + self.m_p)
         x3_dot = x4
@@ -146,4 +149,4 @@ class CartPole(DynamicSystem):
             ]
         )
 
-        return A.astype(np.float32), B.astype(np.float32)
+        return A.astype(np.float64), B.astype(np.float64)

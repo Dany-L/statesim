@@ -1,6 +1,6 @@
 import abc
 from numpy.typing import NDArray
-from typing import List, Callable
+from typing import List, Callable, Optional
 import numpy as np
 
 
@@ -33,6 +33,7 @@ class ContinuousLinear(StateSpaceModel):
         B: NDArray[np.float64],
         C: NDArray[np.float64],
         D: NDArray[np.float64],
+        x_bar: Optional[NDArray[np.float64]] = None,
     ) -> None:
         self._nx = A.shape[0]
         self._nu = B.shape[1]
@@ -43,10 +44,15 @@ class ContinuousLinear(StateSpaceModel):
         self.C = C  # output matrix
         self.D = D  # direct feed through term
 
+        if x_bar is not None:
+            self.x_bar = x_bar
+        else:
+            self.x_bar = np.zeros(shape=(self._nx, 1))
+
     def state_dynamics(self, x, u):
         x = x.reshape(self._nx, 1)
         u = u.reshape(self._nu, 1)
-        return self.A @ x + self.B @ u
+        return self.A @ (x - self.x_bar) + self.B @ u
 
     def output_layer(self, xs, us):
         return [self.C @ x + self.D @ u for x, u in zip(xs, us)]

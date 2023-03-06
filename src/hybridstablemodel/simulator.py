@@ -14,6 +14,7 @@ class SimulationResult:
     xs: List[NDArray[np.float64]]
     us: List[NDArray[np.float64]]
     ys: List[NDArray[np.float64]]
+    name: str
 
 
 class Simulator:
@@ -33,6 +34,7 @@ class Simulator:
         model: StateSpaceModel,
         initial_state: NDArray[np.float64],
         input: List[NDArray[np.float64]],
+        name: str = 'unknown',
     ) -> Tuple[SimulationResult, NDArray[np.float64], Dict[str, Any],]:
         sol = solve_ivp(
             fun=lambda t, y: np.squeeze(
@@ -46,4 +48,8 @@ class Simulator:
         xs = [x.reshape(model._nx, 1) for x in sol.y.T]
         ys = model.output_layer(xs=xs, us=input)
 
-        return SimulationResult(xs=xs, us=input, ys=ys), np.array(sol.t), sol
+        return (
+            SimulationResult(xs=xs, us=input, ys=ys, name=name),
+            np.array(sol.t),
+            sol,
+        )

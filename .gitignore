@@ -16,3 +16,4 @@ debug
 poetry.lock
 *.mypy_cache
 *.pytest_cache
+# *scripts
