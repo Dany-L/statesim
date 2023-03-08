@@ -1,7 +1,7 @@
 from typing import Tuple, List, Callable
 from numpy.typing import NDArray
 import numpy as np
-from hybridstablemodel.simulator import SimulationResult
+from statesim.simulator import SimulationResult
 
 A = np.array([[0, 1], [0.1, -0.8]])
 B = np.array([[0], [1]])
@@ -100,3 +100,11 @@ def get_simulation_results() -> List[SimulationResult]:
             name='two',
         ),
     ]
+
+
+def get_linearization_point_cartpole() -> NDArray[np.float64]:
+    return np.array([[0], [0], [np.pi], [0]])
+
+
+def get_initial_state_cartpole() -> NDArray[np.float64]:
+    return np.array([[0], [0], [np.pi + 0.1], [0]])

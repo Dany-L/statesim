@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "hybridstablemodel"
+name = "statesim"
 version = "0.1.0"
 description = ""
 authors = ["Daniel Frank <daniel.frank@ipvs.uni-stuttgart.de>"]
-packages = [{include = "hybridstablemodel", from = "src"}]
+packages = [{include = "statesim", from = "src"}]
 license = "MIT"
 readme = "README.md"
 
