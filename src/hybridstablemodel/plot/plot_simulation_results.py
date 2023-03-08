@@ -2,19 +2,19 @@ from ..simulator import SimulationResult
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
-from typing import List
+from typing import List, Literal
 
 plt.rcParams['text.usetex'] = True
 
 
-def plot_states(result: SimulationResult, t: NDArray[np.float64]) -> None:
+def plot_states(result: SimulationResult) -> None:
     nx = result.xs[0].shape[0]
     fig, axs = plt.subplots(
         nrows=nx, ncols=1, tight_layout=True, squeeze=False
     )
     fig.suptitle('State plots')
     for element, ax in zip(range(nx), axs[:, 0]):
-        ax.plot(t, np.array([x[element] for x in result.xs]))
+        ax.plot(result.teval, np.array([x[element] for x in result.xs]))
         ax.set_title(f'$x_{element+1}$')
         ax.grid()
 
@@ -26,7 +26,7 @@ def plot_inputs(result: SimulationResult, t: NDArray[np.float64]) -> None:
     )
     fig.suptitle('Input plots')
     for element, ax in zip(range(nu), axs[:, 0]):
-        ax.plot(t, np.array([u[element] for u in result.us]))
+        ax.plot(result.teval, np.array([u[element] for u in result.us]))
         ax.set_title(f'$u_{element+1}$')
         ax.grid()
 
@@ -38,42 +38,24 @@ def plot_outputs(result: SimulationResult, t: NDArray[np.float64]) -> None:
     )
     fig.suptitle('Output plots')
     for element, ax in zip(range(ny), axs[:, 0]):
-        ax.plot(t, np.array([y[element] for y in result.ys]))
+        ax.plot(result.teval, np.array([y[element] for y in result.ys]))
         ax.set_title(f'$y_{element+1}$')
         ax.grid()
 
 
 def plot_comparison(
-    results: List[SimulationResult], t: NDArray[np.float64]
+    results: List[SimulationResult], type: Literal['xs', 'us', 'ys']
 ) -> None:
-    nx = results[0].xs[0].shape[0]
-    fig, axs = plt.subplots(
-        nrows=nx, ncols=1, tight_layout=True, squeeze=False
-    )
-    fig.suptitle('State plots')
-    for element, ax in zip(range(nx), axs[:, 0]):
+    n = getattr(results[0], type)[0].shape[0]
+    fig, axs = plt.subplots(nrows=n, ncols=1, tight_layout=True, squeeze=False)
+    fig.suptitle(f'{type} plots')
+    for element, ax in zip(range(n), axs[:, 0]):
         for result in results:
-            (line,) = ax.plot(t, np.array([x[element] for x in result.xs]))
+            (line,) = ax.plot(
+                result.teval,
+                np.array([x[element] for x in getattr(result, type)]),
+            )
             line.set_label(f'{result.name}')
-        ax.set_title(f'$x_{element+1}$')
+        ax.set_title(f'${type[:-1]}_{element+1}$')
         ax.legend()
         ax.grid()
-    # plot output error
-    if len(results) == 2:
-        ny = results[0].ys[0].shape[0]
-        fig, axs = plt.subplots(
-            nrows=ny, ncols=1, tight_layout=True, squeeze=False
-        )
-        fig.suptitle('Output error')
-        for element, ax in zip(range(nx), axs[:, 0]):
-            ax.plot(
-                t,
-                np.array(
-                    [
-                        y1[element] - y2[element]
-                        for y1, y2 in zip(results[0].ys, results[1].ys)
-                    ]
-                ),
-            )
-            ax.set_title(f'Error of $y_{element+1}$')
-            ax.grid()

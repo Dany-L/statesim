@@ -1,6 +1,7 @@
 from typing import Tuple, List, Callable
 from numpy.typing import NDArray
 import numpy as np
+from hybridstablemodel.simulator import SimulationResult
 
 A = np.array([[0, 1], [0.1, -0.8]])
 B = np.array([[0], [1]])
@@ -58,3 +59,44 @@ def get_input_size() -> int:
 
 def get_output_size() -> int:
     return int(C.shape[0])
+
+
+def get_simulation_results() -> List[SimulationResult]:
+    N = 10
+    nx = 4
+    ny = 2
+    nu = 3
+    return [
+        SimulationResult(
+            xs=[
+                x.reshape(nx, 1)
+                for x in np.random.standard_normal(size=(N, nx))
+            ],
+            us=[
+                u.reshape(nu, 1)
+                for u in np.random.standard_normal(size=(N, nu))
+            ],
+            ys=[
+                y.reshape(ny, 1)
+                for y in np.random.standard_normal(size=(N, ny))
+            ],
+            teval=np.linspace(0, 9, N),
+            name='one',
+        ),
+        SimulationResult(
+            xs=[
+                x.reshape(nx, 1)
+                for x in np.random.standard_normal(size=(N, nx))
+            ],
+            us=[
+                u.reshape(nu, 1)
+                for u in np.random.standard_normal(size=(N, nu))
+            ],
+            ys=[
+                y.reshape(ny, 1)
+                for y in np.random.standard_normal(size=(N, ny))
+            ],
+            teval=np.linspace(0, 9, N),
+            name='two',
+        ),
+    ]
