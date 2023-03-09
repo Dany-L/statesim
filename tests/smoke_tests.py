@@ -5,13 +5,14 @@ from statesim.model.statespace import (
 from statesim.simulator import ContinuousSimulator, DiscreteSimulator
 from statesim.plot.plot_simulation_results import plot_comparison
 from statesim.system.cartpole import CartPole
+from statesim.io import read_measurement_csv
 from typing import List, Dict
 import utils
 import numpy as np
 import sympy as sym
+import os
 
-# SympyType = TypeVar('SympyType', bound=sym.core)
-# SympyMatrix = TypeVar('SympyMatrix', bound=sym.matrices)
+DIRNAME = os.path.dirname(__file__)
 
 
 def test_linear_continuous_simulator() -> None:
@@ -197,3 +198,15 @@ def test_cartpole_linearization_evaluation() -> None:
     assert A.shape == (4, 4)
     assert isinstance(B, np.ndarray)
     assert B.shape == (4, 1)
+
+
+def test_read_measurement_csv() -> None:
+    filepath = os.path.join(
+        DIRNAME, 'data/2023_03_09-01_25_33_cartpole_linear_continous.csv'
+    )
+    measurement = read_measurement_csv(filepath=filepath)
+
+    # y
+    assert measurement.ys[0].shape == (2, 1)
+    # u
+    assert measurement.us[0].shape == (1, 1)

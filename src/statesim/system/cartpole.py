@@ -56,10 +56,24 @@ class CartPole(DynamicSystem):
             self._length,
             self._mu_c,
             self._mu_p,
-        ) = symbols('x1 x2 x3 x4 u g m_p m_c l mu_c mu_p')
+        ) = symbols('x1 x2 x3 x4 u g m_p m_c length mu_c mu_p')
         x_dot = self._get_nonlinear_function()
         self._f_symbol = Matrix(
             [[x_dot[0]], [x_dot[1]], [x_dot[2]], [x_dot[3]]]
+        )
+        self._f = lambdify(
+            [self._x1, self._x2, self._x3, self._x4, self._u],
+            self._f_symbol.evalf(
+                subs={
+                    self._g: self.g,
+                    self._m_p: self.m_p,
+                    self._m_c: self.m_c,
+                    self._length: self.length,
+                    self._mu_c: self.mu_c,
+                    self._mu_p: self.mu_p,
+                }
+            ),
+            'numpy',
         )
 
     def _get_nonlinear_function(self) -> List[sym.core.add.Add]:
@@ -94,20 +108,7 @@ class CartPole(DynamicSystem):
 
     def state_dynamics(self, x, u):
         x1, x2, x3, x4 = x
-        eval_dict = {
-            self._g: self.g,
-            self._m_p: self.m_p,
-            self._m_c: self.m_c,
-            self._length: self.length,
-            self._mu_c: self.mu_c,
-            self._mu_p: self.mu_p,
-        }
-        f = lambdify(
-            [self._x1, self._x2, self._x3, self._x4, self._u],
-            self._f_symbol.evalf(subs=eval_dict),
-            'numpy',
-        )
-        return f(x1, x2, x3, x4, np.squeeze(u)).reshape(self.nx, 1)
+        return self._f(x1, x2, x3, x4, np.squeeze(u)).reshape(self.nx, 1)
 
     def output_function(self, x, u):
         return np.array([[0, 0, 1, 0]]) @ x
