@@ -59,3 +59,25 @@ def plot_comparison(
         ax.set_title(f'${type[:-1]}_{element+1}$')
         ax.legend()
         ax.grid()
+    if len(results) == 2:
+        # print error
+        fig, axs = plt.subplots(
+            nrows=n, ncols=1, tight_layout=True, squeeze=False
+        )
+        fig.suptitle(f'Absolute error {type}')
+        for element, ax in zip(range(n), axs[:, 0]):
+            (line,) = ax.plot(
+                result.teval,
+                np.array(
+                    [
+                        np.abs(x1[element] - x2[element])
+                        for x1, x2 in zip(
+                            getattr(results[0], type),
+                            getattr(results[1], type),
+                        )
+                    ]
+                ),
+            )
+            ax.set_title(f'${type[:-1]}_{element+1}$')
+            ax.legend()
+            ax.grid()

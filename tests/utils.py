@@ -108,3 +108,14 @@ def get_linearization_point_cartpole() -> NDArray[np.float64]:
 
 def get_initial_state_cartpole() -> NDArray[np.float64]:
     return np.array([[0], [0], [np.pi + 0.1], [0]])
+
+
+def calculate_error(
+    ys: List[NDArray[np.float64]], ys_hat: List[NDArray[np.float64]]
+) -> np.float64:
+    assert len(ys) == len(ys_hat)
+    error = 0
+    T = len(ys)
+    for y, y_hat in zip(ys, ys_hat):
+        error += np.linalg.norm(y - y_hat, ord=2)
+    return error / T
