@@ -19,9 +19,7 @@ $$
 \end{pmatrix}
 $$
 - for nonlinear continuous models ($t = [0, T]$):
-$$
-\dot{x}(t) = f(x(t), u(t)) \qquad y(t) = g(x(t), u(t))
-$$
+$$\dot{x}(t) = f(x(t), u(t)),  y(t) = g(x(t), u(t))$$
 - for linear discrete models ($k = 0, \ldots, (T/\eta)-1$):
 $$
 \begin{pmatrix}
