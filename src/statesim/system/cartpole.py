@@ -5,9 +5,6 @@ from typing import Tuple, List
 from sympy import symbols, diff, sin, cos, sign, Matrix, lambdify
 import sympy as sym
 
-# SympyType = TypeVar('SympyType', bound=sym.core)
-# SympyMatrix = TypeVar('SympyMatrix', bound=sym.matrices)
-
 
 class DynamicSystem(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -24,6 +21,10 @@ class DynamicSystem(metaclass=abc.ABCMeta):
 
 
 class CartPole(DynamicSystem):
+    """ Inverted pendulum on a car
+    
+    [1] Barto AG, Sutton RS, Anderson CW. Neuronlike adaptive elements that can solve difficult learning control problems. IEEE transactions on systems, man, and cybernetics. 1983 Sep(5):834-46.
+    """
     def __init__(
         self,
         g: float = 9.81,

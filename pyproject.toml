@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "statesim"
 version = "0.1.0"
-description = ""
+description = "Simulator for state space models, to generate data from differential equations."
 authors = ["Daniel Frank <daniel.frank@ipvs.uni-stuttgart.de>"]
 packages = [{include = "statesim", from = "src"}]
 license = "MIT"

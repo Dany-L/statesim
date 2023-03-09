@@ -4,8 +4,6 @@ import numpy as np
 import dataclasses
 
 from scipy.integrate import solve_ivp
-
-# import model
 from .model.statespace import StateSpaceModel
 
 

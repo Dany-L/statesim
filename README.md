@@ -1,19 +1,42 @@
-# Numeric Simulator for differential equation
-Consistent interface for integrating linear and nonlinear time-invariant state space models using `scipy.integrate.solve_ivp`.
+# Numeric Simulator for state space models
+Simulating ordinary differential equations that have a state space representation with external input. For integration of continuous systems `scipy.integrate.solve_ivp` is used. Discrete systems are iterated with a fixed step size.
 
-Time continuous state space equations
+State space description, given an initial condition $x(0)$ and a fixed time horizon $T$, for discrete system with a step size $\eta$
 
-for linear models:
+- for linear continuous models ($t = [0, T]$):
 $$
-\begin{aligned}
-\dot{x}(t) & = Ax(t) + Bu(t) \\
-y(t) & = Cx(t) + Du(t)
-\end{aligned}
+\begin{pmatrix}
+    \dot{x}(t) \\
+    y(t)
+\end{pmatrix} = 
+\begin{pmatrix}
+    A & B \\
+    C & D
+\end{pmatrix}
+\begin{pmatrix}
+    x(t) \\
+    u(t)
+\end{pmatrix}
 $$
-for nonlinear models:
+- for nonlinear continuous models ($t = [0, T]$):
 $$
-\begin{aligned}
-\dot{x}(t) & = f(x(t), u(t)) \\
-y(t) & = g(x(t), u(t))
-\end{aligned}.
+\dot{x}(t) = f(x(t), u(t)) \qquad y(t) & = g(x(t), u(t))
 $$
+- for linear discrete models ($k = 0, \ldots, (T/\eta)-1$):
+$$
+\begin{pmatrix}
+    \dot{x}(k+1) \\
+    y(k)
+\end{pmatrix} = 
+\begin{pmatrix}
+    A & B \\
+    C & D
+\end{pmatrix}
+\begin{pmatrix}
+    x(k) \\
+    u(k)
+\end{pmatrix}
+$$
+
+## Example
+In `scripts` a some examples on how to use `statesim` are shown in *jupyter notebooks*
