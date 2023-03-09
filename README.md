@@ -20,12 +20,12 @@ $$
 $$
 - for nonlinear continuous models ($t = [0, T]$):
 $$
-\dot{x}(t) = f(x(t), u(t)) \qquad y(t) & = g(x(t), u(t))
+\dot{x}(t) = f(x(t), u(t)) \qquad y(t) = g(x(t), u(t))
 $$
 - for linear discrete models ($k = 0, \ldots, (T/\eta)-1$):
 $$
 \begin{pmatrix}
-    \dot{x}(k+1) \\
+    x(k+1) \\
     y(k)
 \end{pmatrix} = 
 \begin{pmatrix}
@@ -39,4 +39,4 @@ $$
 $$
 
 ## Example
-In `scripts` a some examples on how to use `statesim` are shown in *jupyter notebooks*
+In `scripts` some examples on how to use `statesim` are shown in *jupyter notebooks*
