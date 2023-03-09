@@ -13,6 +13,10 @@ DIRNAME = os.path.dirname(__file__)
 
 
 class TestSimulation:
+    """Compare simulation results to matlab generated simulation
+
+    Load data from .csv files and run comparison
+    """
     T = 10.0
     step_size = 0.01
     x_bar = utils.get_linearization_point_cartpole()
