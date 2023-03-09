@@ -3,16 +3,24 @@ from statesim.model.statespace import (
     Nonlinear,
 )
 from statesim.simulator import ContinuousSimulator, DiscreteSimulator
-from statesim.plot.plot_simulation_results import plot_comparison
+from statesim.plot.plot_simulation_results import (
+    plot_comparison,
+    plot_inputs,
+    plot_outputs,
+    plot_states,
+)
 from statesim.system.cartpole import CartPole
-from statesim.io import read_measurement_csv
+from statesim.io import (
+    read_measurement_csv,
+    write_measurement_csv,
+    convert_simulation_to_measurement,
+)
+from statesim.generate.input import generate_random_static_input
 from typing import List, Dict
 import utils
 import numpy as np
 import sympy as sym
 import os
-
-DIRNAME = os.path.dirname(__file__)
 
 
 def test_linear_continuous_simulator() -> None:
@@ -171,6 +179,21 @@ def test_plot_simulation_results() -> None:
         plot_comparison(results=results, type=type)
 
 
+def test_plot_states() -> None:
+    results = utils.get_simulation_results()
+    plot_states(result=results[0])
+
+
+def test_plot_inputs() -> None:
+    results = utils.get_simulation_results()
+    plot_inputs(result=results[0])
+
+
+def test_plot_outputs() -> None:
+    results = utils.get_simulation_results()
+    plot_outputs(result=results[0])
+
+
 def test_cartpole_state_dynamics() -> None:
     system = CartPole()
     x0 = utils.get_initial_state_cartpole()
@@ -202,7 +225,8 @@ def test_cartpole_linearization_evaluation() -> None:
 
 def test_read_measurement_csv() -> None:
     filepath = os.path.join(
-        DIRNAME, 'data/2023_03_09-01_25_33_cartpole_linear_continous.csv'
+        utils.get_directory(),
+        'data/2023_03_09-01_25_33_cartpole_linear_continous.csv',
     )
     measurement = read_measurement_csv(filepath=filepath)
 
@@ -210,3 +234,25 @@ def test_read_measurement_csv() -> None:
     assert measurement.ys[0].shape == (2, 1)
     # u
     assert measurement.us[0].shape == (1, 1)
+
+
+def test_generate_static_random_input() -> None:
+    us = generate_random_static_input(
+        N=20, nu=2, amplitude_range=(-4.0, 4.0), frequency_range=(1, 4)
+    )
+    us_numpy = np.array(us)
+    assert us[0].shape == (2, 1)
+    assert len(us) == 20
+    # check if elements are non zero
+    assert np.squeeze(np.where(us_numpy == 0)).size == 0
+
+
+def test_write_measurement_csv() -> None:
+    m_data = utils.get_measurement_data()
+    filepath = os.path.join(utils.get_tmp_directory(), 'measurement.csv')
+    write_measurement_csv(filepath=filepath, measure_data=m_data)
+
+
+def test_convert_simulation_to_measurement() -> None:
+    s_res = utils.get_simulation_results()
+    convert_simulation_to_measurement(sim_result=s_res[0])

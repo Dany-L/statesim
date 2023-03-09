@@ -1,7 +1,6 @@
 from ..simulator import SimulationResult
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.typing import NDArray
 from typing import List, Literal
 
 plt.rcParams['text.usetex'] = True
@@ -19,7 +18,7 @@ def plot_states(result: SimulationResult) -> None:
         ax.grid()
 
 
-def plot_inputs(result: SimulationResult, t: NDArray[np.float64]) -> None:
+def plot_inputs(result: SimulationResult) -> None:
     nu = result.us[0].shape[0]
     fig, axs = plt.subplots(
         nrows=nu, ncols=1, tight_layout=True, squeeze=False
@@ -31,7 +30,7 @@ def plot_inputs(result: SimulationResult, t: NDArray[np.float64]) -> None:
         ax.grid()
 
 
-def plot_outputs(result: SimulationResult, t: NDArray[np.float64]) -> None:
+def plot_outputs(result: SimulationResult) -> None:
     ny = result.ys[0].shape[0]
     fig, axs = plt.subplots(
         nrows=ny, ncols=1, tight_layout=True, squeeze=False

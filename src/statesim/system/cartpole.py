@@ -21,10 +21,11 @@ class DynamicSystem(metaclass=abc.ABCMeta):
 
 
 class CartPole(DynamicSystem):
-    """ Inverted pendulum on a car
-    
+    """Inverted pendulum on a car
+
     [1] Barto AG, Sutton RS, Anderson CW. Neuronlike adaptive elements that can solve difficult learning control problems. IEEE transactions on systems, man, and cybernetics. 1983 Sep(5):834-46.
     """
+
     def __init__(
         self,
         g: float = 9.81,

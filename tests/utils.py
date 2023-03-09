@@ -2,11 +2,23 @@ from typing import Tuple, List, Callable
 from numpy.typing import NDArray
 import numpy as np
 from statesim.simulator import SimulationResult
+from statesim.io import SimulationMeasurement
+import os
+
+DIRNAME = os.path.dirname(__file__)
 
 A = np.array([[0, 1], [0.1, -0.8]])
 B = np.array([[0], [1]])
 C = np.array([[1, 0]])
 D = np.array([[0]])
+
+
+def get_tmp_directory() -> str:
+    return os.path.join(DIRNAME, '_tmp')
+
+
+def get_directory() -> str:
+    return DIRNAME
 
 
 def get_linear_matrices() -> (
@@ -119,3 +131,16 @@ def calculate_error(
     for y, y_hat in zip(ys, ys_hat):
         error += np.linalg.norm(y - y_hat, ord=2)
     return error / T
+
+
+def get_measurement_data() -> SimulationMeasurement:
+    T = 4
+    eta = 0.2
+    N = int(T / eta)
+    ny = 2
+    nu = 3
+    return SimulationMeasurement(
+        t=np.linspace(0, T - eta, N),
+        ys=[y.reshape(ny, 1) for y in np.random.standard_normal(size=(N, ny))],
+        us=[u.reshape(nu, 1) for u in np.random.standard_normal(size=(N, nu))],
+    )
