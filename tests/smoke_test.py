@@ -3,12 +3,13 @@ from statesim.model.statespace import (
     Nonlinear,
 )
 from statesim.simulator import ContinuousSimulator, DiscreteSimulator
-from statesim.plot.plot_simulation_results import (
+from statesim.analysis.plot_simulation_results import (
     plot_comparison,
     plot_inputs,
     plot_outputs,
     plot_states,
 )
+from statesim.analysis.system_analysis import SystemAnalysisContinuous
 from statesim.system.cartpole import CartPole
 from statesim.io import (
     read_measurement_csv,
@@ -21,12 +22,13 @@ import utils
 import numpy as np
 import sympy as sym
 import os
+import math
 
 
 def test_linear_continuous_simulator() -> None:
     u = utils.get_input()
     x0 = utils.get_initial_state()
-    A, B, C, D = utils.get_linear_matrices()
+    A, B, C, D = utils.get_stable_linear_matrices()
     nx = utils.get_state_size()
     nu = utils.get_input_size()
     ny = utils.get_output_size()
@@ -53,7 +55,7 @@ def test_linear_continuous_simulator() -> None:
 def test_linear_continuous_simulator_step_size() -> None:
     u = utils.get_input()
     x0 = utils.get_initial_state()
-    A, B, C, D = utils.get_linear_matrices()
+    A, B, C, D = utils.get_stable_linear_matrices()
     step_size = 0.02
     model = Linear(A=A, B=B, C=C, D=D)
     sim = ContinuousSimulator(T=float(len(u) * step_size), step_size=step_size)
@@ -66,7 +68,7 @@ def test_linear_continuous_simulator_step_size() -> None:
 def test_linear_model() -> None:
     u = utils.get_input()
     x0 = utils.get_initial_state()
-    A, B, C, D = utils.get_linear_matrices()
+    A, B, C, D = utils.get_stable_linear_matrices()
     model = Linear(A=A, B=B, C=C, D=D)
     xdot = model.state_dynamics(x0, u[0])
 
@@ -148,7 +150,7 @@ def test_nonlinear_model() -> None:
 def test_linear_discrete_simulator() -> None:
     u = utils.get_input()
     x0 = utils.get_initial_state()
-    A, B, C, D = utils.get_linear_matrices()
+    A, B, C, D = utils.get_stable_linear_matrices()
     nx = utils.get_state_size()
     nu = utils.get_input_size()
     ny = utils.get_output_size()
@@ -256,3 +258,44 @@ def test_write_measurement_csv() -> None:
 def test_convert_simulation_to_measurement() -> None:
     s_res = utils.get_simulation_results()
     convert_simulation_to_measurement(sim_result=s_res[0])
+
+
+def test_plot_magnitude() -> None:
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    ana.plot_magnitude()
+
+
+def test_get_peak_gain() -> None:
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    ana.get_peak_gain()
+
+
+def test_get_h_inf_norm() -> None:
+    ana = SystemAnalysisContinuous(utils.get_unstable_linear_matrices())
+
+    h_inf = ana.get_h_inf_norm()
+    print(h_inf)
+    assert math.isinf(h_inf)
+
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    h_inf = ana.get_h_inf_norm()
+    assert not math.isinf(h_inf)
+
+
+def test_get_real_eigenvalues() -> None:
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    ana.get_real_eigenvalues()
+
+
+def test_is_stable() -> None:
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    assert ana.is_stable()
+    ana = SystemAnalysisContinuous(utils.get_unstable_linear_matrices())
+    assert not ana.is_stable()
+
+
+def test_analysis() -> None:
+    ana = SystemAnalysisContinuous(utils.get_stable_linear_matrices())
+    ana.analysis()
+    ana = SystemAnalysisContinuous(utils.get_unstable_linear_matrices())
+    ana.analysis()

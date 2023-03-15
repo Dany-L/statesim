@@ -7,10 +7,15 @@ import os
 
 DIRNAME = os.path.dirname(__file__)
 
-A = np.array([[0, 1], [0.1, -0.8]])
+A = np.array([[0, 1], [-1, -5]])
 B = np.array([[0], [1]])
 C = np.array([[1, 0]])
 D = np.array([[0]])
+
+A_un = np.array([[0, 1], [0.1, -0.8]])
+B_un = np.array([[0], [1]])
+C_un = np.array([[1, 0]])
+D_un = np.array([[0]])
 
 
 def get_tmp_directory() -> str:
@@ -21,7 +26,7 @@ def get_directory() -> str:
     return DIRNAME
 
 
-def get_linear_matrices() -> (
+def get_stable_linear_matrices() -> (
     Tuple[
         NDArray[np.float64],
         NDArray[np.float64],
@@ -30,6 +35,17 @@ def get_linear_matrices() -> (
     ]
 ):
     return (A, B, C, D)
+
+
+def get_unstable_linear_matrices() -> (
+    Tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]
+):
+    return (A_un, B_un, C_un, D_un)
 
 
 def get_input() -> List[NDArray[np.float64]]:
