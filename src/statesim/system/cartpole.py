@@ -1,23 +1,9 @@
 import numpy as np
-import abc
+from .base import DynamicSystem
 from numpy.typing import NDArray
 from typing import Tuple, List
 from sympy import symbols, diff, sin, cos, sign, Matrix, lambdify
 import sympy as sym
-
-
-class DynamicSystem(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def state_dynamics(
-        self, x: NDArray[np.float64], u: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        pass
-
-    @abc.abstractmethod
-    def output_function(
-        self, x: NDArray[np.float64], u: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        pass
 
 
 class CartPole(DynamicSystem):

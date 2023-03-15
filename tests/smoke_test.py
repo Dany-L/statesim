@@ -11,6 +11,7 @@ from statesim.analysis.plot_simulation_results import (
 )
 from statesim.analysis.system_analysis import SystemAnalysisContinuous
 from statesim.system.cartpole import CartPole
+from statesim.system.inverted_pendulum import InvertedPendulum
 from statesim.io import (
     read_measurement_csv,
     write_measurement_csv,
@@ -299,3 +300,24 @@ def test_analysis() -> None:
     ana.analysis()
     ana = SystemAnalysisContinuous(utils.get_unstable_linear_matrices())
     ana.analysis()
+
+
+def test_inverted_pendulum_state_dynamics() -> None:
+    system = InvertedPendulum()
+    x0 = utils.get_initial_state_inverted_pendulum()
+    x1 = system.state_dynamics(x=x0, u=np.array([[0]]))
+    assert x1.shape == (2, 1)
+
+
+def test_inverted_pendulum_linearization_evaluation() -> None:
+    system = InvertedPendulum()
+    A_sym, B_sym = system.get_linearization()
+    x_bar = utils.get_linearization_point_inverted_pendulum()
+    A, B = system.evaluate_linearization(
+        A_sym=A_sym, B_sym=B_sym, x_bar=x_bar, u_bar=np.array([[0]])
+    )
+
+    assert isinstance(A, np.ndarray)
+    assert A.shape == (2, 2)
+    assert isinstance(B, np.ndarray)
+    assert B.shape == (2, 1)
