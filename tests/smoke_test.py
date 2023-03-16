@@ -12,6 +12,7 @@ from statesim.analysis.plot_simulation_results import (
 from statesim.analysis.system_analysis import SystemAnalysisContinuous
 from statesim.system.cartpole import CartPole
 from statesim.system.inverted_pendulum import InvertedPendulum
+from statesim.system.coupled_msd import CoupledMsd
 from statesim.io import (
     read_measurement_csv,
     write_measurement_csv,
@@ -321,3 +322,46 @@ def test_inverted_pendulum_linearization_evaluation() -> None:
     assert A.shape == (2, 2)
     assert isinstance(B, np.ndarray)
     assert B.shape == (2, 1)
+
+
+def test_coupled_msd_dynamics() -> None:
+    system = CoupledMsd()
+    x0 = utils.get_initial_state_msd()
+    x1 = system.state_dynamics(x=x0, u=np.array([[0]]))
+    y1 = system.output_function(x=x1, u=np.array([[0]]))
+    assert x1.shape == (8, 1)
+    assert y1.shape == (1, 1)
+
+
+def test_coupled_msd_multiple_carts() -> None:
+    for N in range(2, 6):
+        N = 2
+        system = CoupledMsd(
+            N=N,
+            k=np.array(range(1, N + 1)),
+            m=np.array(range(1, N + 1)),
+            c=np.array(range(1, N + 1)),
+        )
+        x0 = np.zeros(shape=(N * 2, 1))
+        x1 = system.state_dynamics(x=x0, u=np.array([[0]]))
+        assert x1.shape == (N * 2, 1)
+
+
+def test_coupled_msd_linearization() -> None:
+    system = CoupledMsd()
+    A, B = system.get_linearization()
+    assert A.shape == (8, 8)
+    assert B.shape == (8, 1)
+
+
+def test_coupled_msd_evaluate_linearization() -> None:
+    system = CoupledMsd()
+    A_sym, B_sym = system.get_linearization()
+    A, B = system.evaluate_linearization(
+        A_sym=A_sym,
+        B_sym=B_sym,
+        x_bar=np.zeros(shape=(8, 1)),
+        u_bar=np.array([[0]]),
+    )
+    assert A.shape == (8, 8)
+    assert B.shape == (8, 1)

@@ -146,6 +146,10 @@ def get_initial_state_inverted_pendulum() -> NDArray[np.float64]:
     return np.array([[np.pi + 0.1], [0]])
 
 
+def get_initial_state_msd() -> NDArray[np.float64]:
+    return np.array([[0], [0], [0], [0], [0], [0], [0], [0]])
+
+
 def calculate_error(
     ys: List[NDArray[np.float64]], ys_hat: List[NDArray[np.float64]]
 ) -> np.float64:
