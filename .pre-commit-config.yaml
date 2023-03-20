@@ -1,0 +1,38 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: check
+        name: Poetry check
+        entry: poetry check
+        language: system
+        pass_filenames: false
+    -   id: lock
+        name: Poetry lock
+        entry: poetry lock
+        language: system
+        pass_filenames: false
+    -   id: install
+        name: Poetry install
+        entry: poetry install
+        language: system
+        pass_filenames: false
+    -   id: mypy
+        name: MyPy
+        entry: poetry run mypy src
+        language: system
+        pass_filenames: false
+    -   id: pytest
+        name: PyTest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+    -   id: black
+        name: Black
+        entry: poetry run black src scripts tests
+        language: system
+        pass_filenames: false
+    -   id: flake8
+        name: Flake8
+        entry: poetry run flake8 src
+        language: system
+        pass_filenames: false
