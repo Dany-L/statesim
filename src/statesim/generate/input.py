@@ -10,9 +10,13 @@ def generate_random_static_input(
     frequency_range: Tuple[int, int],
 ) -> List[NDArray[np.float64]]:
     """
-    Generate a random static input sequence of length N, the amplitude is static for a random interval of the range `frequency_range`
-
-    The amplitude of the sequence switches after a random number of steps in the range of `frequency_range`, and stays constant until the next switching point or the end of the sequence
+    Generate a random static input sequence of length N,
+    the amplitude is static for a random interval of the range
+    `frequency_range` The amplitude of the sequence
+    switches after a random number of steps
+    in the range of `frequency_range`,
+    and stays constant until the next switching point
+    or the end of the sequence
     """
 
     assert frequency_range[1] < N

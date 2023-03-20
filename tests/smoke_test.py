@@ -1,7 +1,4 @@
-from statesim.model.statespace import (
-    Linear,
-    Nonlinear,
-)
+from statesim.model.statespace import Linear, Nonlinear, Lure
 from statesim.simulator import ContinuousSimulator, DiscreteSimulator
 from statesim.analysis.plot_simulation_results import (
     plot_comparison,
@@ -365,3 +362,29 @@ def test_coupled_msd_evaluate_linearization() -> None:
     )
     assert A.shape == (8, 8)
     assert B.shape == (8, 1)
+
+
+def test_lure() -> None:
+    u = utils.get_input()
+    x0 = utils.get_initial_state()
+    A, B1, C1, D11 = utils.get_stable_linear_matrices()
+    C2 = np.random.normal(size=(4, 2))
+    B2 = np.random.normal(size=(2, 4))
+    D21 = np.random.normal(size=(4, 1))
+    D12 = np.random.normal(size=(1, 4))
+    model = Lure(
+        A=A,
+        B1=B1,
+        B2=B2,
+        C1=C1,
+        C2=C2,
+        D11=D11,
+        D12=D12,
+        D21=D21,
+        Delta=np.tanh,
+    )
+    x1 = model.state_dynamics(x0, u[0])
+    y = model.output_layer(xs=[x0, x1], us=[u[0], u[1]])
+
+    assert x1.shape == (2, 1)
+    assert y[1].shape == (1, 1)

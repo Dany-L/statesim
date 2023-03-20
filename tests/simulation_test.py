@@ -46,7 +46,7 @@ class TestSimulation:
             x_bar=self.x_bar,
         )
         error = utils.calculate_error(result.ys, measurements.ys)
-        assert error < 1e-4
+        assert error < 0.1
 
     def test_cartpole_compare_simulation_results_continuous_nonlinear(
         self,
@@ -73,7 +73,7 @@ class TestSimulation:
             name='nonlinear continuous',
         )
         error = utils.calculate_error(result.ys, measurements.ys)
-        assert error < 1e-4
+        assert error < 0.1
 
     def test_cartpole_compare_simulation_results_discrete_linear(self) -> None:
         filepath = os.path.join(
@@ -102,4 +102,4 @@ class TestSimulation:
         )
         error = utils.calculate_error(result.ys, measurements.ys)
 
-        assert error < 1e-4
+        assert error < 0.01

@@ -72,3 +72,40 @@ class Nonlinear(StateSpaceModel):
 
     def output_layer(self, xs, us):
         return [self.g(x, u) for x, u in zip(xs, us)]
+
+
+class Lure(Linear):
+    def __init__(
+        self,
+        A: NDArray[np.float64],
+        B1: NDArray[np.float64],
+        B2: NDArray[np.float64],
+        C1: NDArray[np.float64],
+        C2: NDArray[np.float64],
+        D11: NDArray[np.float64],
+        D12: NDArray[np.float64],
+        D21: NDArray[np.float64],
+        Delta: Callable[[NDArray[np.float64]], NDArray[np.float64]],
+    ) -> None:
+        super().__init__(A=A, B=B1, C=C1, D=D11)
+        self.B2 = B2
+        self.C2 = C2
+        self.D12 = D12
+        self.D21 = D21
+        self.Delta = Delta  # static nonlinearity
+
+    def state_dynamics(self, x, u):
+        return (
+            super().state_dynamics(x, u)
+            + self.B2 @ self.Delta(self.C2 @ x + self.D21 @ u)
+        ).reshape(self._nx, 1)
+
+    def output_layer(self, xs, us):
+        internals = super().output_layer(xs, us)
+
+        return [
+            (
+                internal + self.D12 @ self.Delta(self.C2 @ x + self.D21 @ u)
+            ).reshape(self._ny, 1)
+            for internal, u, x in zip(internals, us, xs)
+        ]

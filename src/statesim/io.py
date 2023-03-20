@@ -32,7 +32,8 @@ def read_measurement_csv(filepath: str) -> SimulationMeasurement:
 def write_measurement_csv(
     filepath: str, measure_data: SimulationMeasurement
 ) -> None:
-    """Write input output measurements and time to csv, column names are u_<idx>, y_<idx> and t"""
+    """Write input output measurements and time to csv,
+    column names are u_<idx>, y_<idx> and t"""
     assert os.path.isdir(os.path.dirname(filepath))
     ny = measure_data.ys[0].shape[0]
     nu = measure_data.us[0].shape[0]
