@@ -26,6 +26,7 @@ class SystemConfig(BaseModel):
     name: str
     A: Optional[List[float]]
     B: Optional[List[float]]
+    C: Optional[List[float]]
 
 
 class CartPoleConfig(SystemConfig):
@@ -60,7 +61,7 @@ class GenerateConfig(BaseModel):
 config = GenerateConfig.parse_obj(
     {
         'result_directory': '~/cartpole',
-        'folder_name': time.strftime('%Y_%m_%d-%H_%M_%S', time.localtime()),
+        'folder_name': 'initial_state_0_K_100_T_20_u_static_random',
         'seed': 2023,
         'K': 100,
         'T': 20,
@@ -106,6 +107,7 @@ if __name__ == "__main__":
     )
     config.system.A = A.tolist()
     config.system.B = B.tolist()
+    config.system.C = np.array([[0, 0, 1, 0]]).tolist()
 
     sim = ContinuousSimulator(T=config.T, step_size=config.step_size)
     model = Nonlinear(
@@ -118,9 +120,9 @@ if __name__ == "__main__":
 
     assert os.path.isdir(os.path.expanduser(config.result_directory))
     result_directory_path = os.path.join(
-        os.path.expanduser(config.result_directory), config.folder_name
+        os.path.expanduser(config.result_directory), config.folder_name, 'raw'
     )
-    os.mkdir(result_directory_path)
+    os.makedirs(result_directory_path, exist_ok=True)
 
     print('Write configuration file')
     with open(

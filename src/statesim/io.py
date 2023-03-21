@@ -69,3 +69,12 @@ def convert_simulation_to_measurement(
     return SimulationMeasurement(
         t=sim_result.teval, ys=sim_result.ys, us=sim_result.us
     )
+
+
+def get_csv_file_list(directory: str) -> List[str]:
+    assert os.path.isdir(directory)
+    csv_files = []
+    for f in os.listdir(directory):
+        if f.endswith('.csv'):
+            csv_files.append(f)
+    return csv_files
