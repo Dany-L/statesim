@@ -13,7 +13,6 @@ from statesim.system.coupled_msd import CoupledMsd
 from statesim.io import (
     read_measurement_csv,
     write_measurement_csv,
-    convert_simulation_to_measurement,
 )
 from statesim.generate.input import generate_random_static_input
 from typing import List, Dict
@@ -38,7 +37,7 @@ def test_linear_continuous_simulator() -> None:
 
     assert isinstance(result.ys, List)
     assert isinstance(info, Dict)
-    assert isinstance(result.teval, np.ndarray)
+    assert isinstance(result.t, np.ndarray)
     assert isinstance(result.ys[0], np.ndarray)
     # output
     assert len(result.ys) == len(u)
@@ -61,7 +60,7 @@ def test_linear_continuous_simulator_step_size() -> None:
     result, info = sim.simulate(model=model, initial_state=x0, input=u)
 
     assert info.success is True
-    assert (result.teval[2] - result.teval[1]) - step_size < 1e-5
+    assert (result.t[2] - result.t[1]) - step_size < 1e-5
 
 
 def test_linear_model() -> None:
@@ -93,7 +92,7 @@ def test_nonlinear_continuous_simulator() -> None:
 
     assert isinstance(result.ys, List)
     assert isinstance(info, Dict)
-    assert isinstance(result.teval, np.ndarray)
+    assert isinstance(result.t, np.ndarray)
     assert isinstance(result.ys[0], np.ndarray)
     # output
     assert len(result.ys) == len(u)
@@ -124,7 +123,7 @@ def test_nonlinear_continuous_simulator_step_size() -> None:
     result, info = sim.simulate(model=model, initial_state=x0, input=u)
 
     assert info.success is True
-    assert (result.teval[2] - result.teval[1]) - step_size < 1e-5
+    assert (result.t[2] - result.t[1]) - step_size < 1e-5
 
 
 def test_nonlinear_model() -> None:
@@ -160,7 +159,7 @@ def test_linear_discrete_simulator() -> None:
     result = sim.simulate(model=model, initial_state=x0, input=u)
 
     assert isinstance(result.ys, List)
-    assert isinstance(result.teval, np.ndarray)
+    assert isinstance(result.t, np.ndarray)
     assert isinstance(result.ys[0], np.ndarray)
     # output
     assert len(result.ys) == len(u)
@@ -249,14 +248,9 @@ def test_generate_static_random_input() -> None:
 
 
 def test_write_measurement_csv() -> None:
-    m_data = utils.get_measurement_data()
+    data = utils.get_measurement_data()
     filepath = os.path.join(utils.get_tmp_directory(), 'measurement.csv')
-    write_measurement_csv(filepath=filepath, measure_data=m_data)
-
-
-def test_convert_simulation_to_measurement() -> None:
-    s_res = utils.get_simulation_results()
-    convert_simulation_to_measurement(sim_result=s_res[0])
+    write_measurement_csv(filepath=filepath, simulation_data=data)
 
 
 def test_plot_magnitude() -> None:

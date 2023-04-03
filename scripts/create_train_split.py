@@ -1,23 +1,16 @@
 import os
 from pydantic import BaseModel
 from statesim.io import get_csv_file_list
+from statesim.configuration import SplitConfig, GenerateConfig
 import numpy as np
 import random
 import shutil
-from typing import Optional, Dict
 
-
-class SplitConfig(BaseModel):
-    raw_data_directory: str
-    train_split: float
-    validation_split: float
-    seed: int
-    split_filenames: Optional[Dict]
-
+from pathlib import Path
 
 config = SplitConfig.parse_obj(
     {
-        'raw_data_directory': '~/cartpole/initial_state_0_K_100_T_20_u_static_random/raw',
+        'raw_data_directory': '~/pendulum/initial_state_0_K_100_T_20_u_static_random/raw/',
         'train_split': 0.6,
         'validation_split': 0.1,
         'seed': 2023,
@@ -40,6 +33,15 @@ if __name__ == "__main__":
         os.path.expanduser(config.raw_data_directory)
     )
     n_files = len(csv_files)
+
+    raw_config = GenerateConfig.parse_file(
+        path=Path(
+            os.path.join(
+                os.path.expanduser(config.raw_data_directory), 'config.json'
+            )
+        )
+    )
+    config.initial_state = raw_config.simulator.initial_state
 
     n_train_files = int(config.train_split * n_files)
     n_validation_files = int(config.validation_split * n_files)

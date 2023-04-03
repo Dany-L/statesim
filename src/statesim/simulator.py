@@ -8,11 +8,11 @@ from .model.statespace import StateSpaceModel
 
 
 @dataclasses.dataclass
-class SimulationResult:
+class SimulationData:
     xs: List[NDArray[np.float64]]
     us: List[NDArray[np.float64]]
     ys: List[NDArray[np.float64]]
-    teval: NDArray[np.float64]
+    t: NDArray[np.float64]
     name: str
 
 
@@ -32,7 +32,7 @@ class DiscreteSimulator:
         input: List[NDArray[np.float64]],
         name: str = 'unknown',
         x_bar: Optional[NDArray[np.float64]] = None,
-    ) -> SimulationResult:
+    ) -> SimulationData:
         x_bar = get_x_bar(x_bar=x_bar, nx=model._nx)
         xs = []
         xs.append(initial_state - x_bar)
@@ -41,8 +41,8 @@ class DiscreteSimulator:
         xs = [x + x_bar for x in xs]
         ys = model.output_layer(xs=xs, us=input)
 
-        return SimulationResult(
-            xs=xs[0:-1], us=input, ys=ys, name=name, teval=self.teval
+        return SimulationData(
+            xs=xs[0:-1], us=input, ys=ys, name=name, t=self.teval
         )
 
 
@@ -65,7 +65,7 @@ class ContinuousSimulator:
         input: List[NDArray[np.float64]],
         name: str = 'unknown',
         x_bar: Optional[NDArray[np.float64]] = None,
-    ) -> Tuple[SimulationResult, Dict[str, Any]]:
+    ) -> Tuple[SimulationData, Dict[str, Any]]:
         x_bar = get_x_bar(x_bar=x_bar, nx=model._nx)
         sol = solve_ivp(
             fun=lambda t, y: np.squeeze(
@@ -80,8 +80,8 @@ class ContinuousSimulator:
         ys = model.output_layer(xs=xs, us=input)
 
         return (
-            SimulationResult(
-                xs=xs, us=input, ys=ys, name=name, teval=np.array(sol.t)
+            SimulationData(
+                xs=xs, us=input, ys=ys, name=name, t=np.array(sol.t)
             ),
             sol,
         )

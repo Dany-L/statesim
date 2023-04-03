@@ -1,8 +1,8 @@
 from typing import Tuple, List, Callable
 from numpy.typing import NDArray
 import numpy as np
-from statesim.simulator import SimulationResult
-from statesim.io import SimulationMeasurement
+from statesim.simulator import SimulationData
+from statesim.io import SimulationData
 import os
 
 DIRNAME = os.path.dirname(__file__)
@@ -89,13 +89,13 @@ def get_output_size() -> int:
     return int(C.shape[0])
 
 
-def get_simulation_results() -> List[SimulationResult]:
+def get_simulation_results() -> List[SimulationData]:
     N = 10
     nx = 4
     ny = 2
     nu = 3
     return [
-        SimulationResult(
+        SimulationData(
             xs=[
                 x.reshape(nx, 1)
                 for x in np.random.standard_normal(size=(N, nx))
@@ -108,10 +108,10 @@ def get_simulation_results() -> List[SimulationResult]:
                 y.reshape(ny, 1)
                 for y in np.random.standard_normal(size=(N, ny))
             ],
-            teval=np.linspace(0, 9, N),
+            t=np.linspace(0, 9, N),
             name='one',
         ),
-        SimulationResult(
+        SimulationData(
             xs=[
                 x.reshape(nx, 1)
                 for x in np.random.standard_normal(size=(N, nx))
@@ -124,7 +124,7 @@ def get_simulation_results() -> List[SimulationResult]:
                 y.reshape(ny, 1)
                 for y in np.random.standard_normal(size=(N, ny))
             ],
-            teval=np.linspace(0, 9, N),
+            t=np.linspace(0, 9, N),
             name='two',
         ),
     ]
@@ -161,14 +161,16 @@ def calculate_error(
     return error / T
 
 
-def get_measurement_data() -> SimulationMeasurement:
+def get_measurement_data() -> SimulationData:
     T = 4
     eta = 0.2
     N = int(T / eta)
     ny = 2
     nu = 3
-    return SimulationMeasurement(
+    return SimulationData(
         t=np.linspace(0, T - eta, N),
         ys=[y.reshape(ny, 1) for y in np.random.standard_normal(size=(N, ny))],
         us=[u.reshape(nu, 1) for u in np.random.standard_normal(size=(N, nu))],
+        xs=[],
+        name='unknown',
     )
