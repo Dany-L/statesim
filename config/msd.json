@@ -1,0 +1,33 @@
+{
+    "result_directory": "~/mass-spring-damper",
+    "base_name": "initial_state-0",
+    "seed": 2023,
+    "K": 200,
+    "T": 300,
+    "step_size": 0.05,
+    "input": {
+        "u_max": 0.2,
+        "u_min": -0.2,
+        "interval_min": 20,
+        "interval_max": 100
+    },
+    "system": {
+        "name": "CoupledMsd",
+        "nx": 8,
+        "ny": 1,
+        "nu": 1,
+        "C": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        "xbar": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        "ubar": [0.0],
+        "N": 4,
+        "k": [0.25, 0.33, 0.4167, 0.5],
+        "c": [0.25, 0.33, 0.4167, 0.5],
+        "m": [1.0, 0.833, 0.67, 0.5]
+    },
+    "simulator": {"initial_state": [0, 0, 0, 0, 0, 0, 0, 0]},
+    "measurement_noise": {
+        "type": "gaussian",
+        "mean": 0.0,
+        "std": 0.02
+    }
+}

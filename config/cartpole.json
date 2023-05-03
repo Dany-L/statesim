@@ -1,0 +1,30 @@
+{
+    "result_directory": "~/cartpole",
+    "base_name": "initial_state_0_K_100_T_20_u_static_random",
+    "seed": 2023,
+    "K": 100,
+    "T": 20,
+    "step_size": 0.02,
+    "input": {
+        "u_max": 10,
+        "u_min": -10,
+        "interval_min": 20,
+        "interval_max": 100
+    },
+    "system": {
+        "name": "CartPole",
+        "nx": 4,
+        "ny": 1,
+        "nu": 1,
+        "C": [0.0, 0.0, 1.0, 0.0],
+        "xbar": [0.0, 0.0, 3.14, 0.0],
+        "ubar": [0.0],
+        "g": 9.81,
+        "m_c": 1.0,
+        "m_p": 0.1,
+        "length": 0.5,
+        "mu_c": 0.0,
+        "mu_p": 0.01
+    },
+    "simulator": {"initial_state": [0, 0, 0, 0]}
+}
