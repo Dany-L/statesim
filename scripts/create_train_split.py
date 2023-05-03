@@ -10,7 +10,7 @@ from pathlib import Path
 
 config = SplitConfig.parse_obj(
     {
-        'raw_data_directory': '~/pendulum/initial_state_0_K_100_T_20_u_static_random/raw/',
+        'raw_data_directory': '/Users/jack/pendulum/initial_state_0_K-100_T-20/raw',
         'train_split': 0.6,
         'validation_split': 0.1,
         'seed': 2023,

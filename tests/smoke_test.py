@@ -6,6 +6,7 @@ from statesim.analysis.plot_simulation_results import (
     plot_outputs,
     plot_states,
 )
+from statesim.noise import get_noise, NoiseGeneration
 from statesim.analysis.system_analysis import SystemAnalysisContinuous
 from statesim.system.cartpole import CartPole
 from statesim.system.inverted_pendulum import InvertedPendulum
@@ -33,21 +34,27 @@ def test_linear_continuous_simulator() -> None:
     model = Linear(A=A, B=B, C=C, D=D)
 
     sim = ContinuousSimulator(T=float(len(u)))
-    result, info = sim.simulate(model=model, initial_state=x0, input=u)
+    measurement_noises = (NoiseGeneration('gaussian', 0.0, 0.01), None)
+    for measurement_noise in measurement_noises:
+        result = sim.simulate(
+            model=model,
+            initial_state=x0,
+            input=u,
+            noise_config=measurement_noise,
+        )
 
-    assert isinstance(result.ys, List)
-    assert isinstance(info, Dict)
-    assert isinstance(result.t, np.ndarray)
-    assert isinstance(result.ys[0], np.ndarray)
-    # output
-    assert len(result.ys) == len(u)
-    assert result.ys[0].shape == (ny, 1)
-    # state
-    assert len(result.xs) == len(u)
-    assert result.xs[0].shape == (nx, 1)
-    # input
-    assert len(result.us) == len(u)
-    assert result.us[0].shape == (nu, 1)
+        assert isinstance(result.ys, List)
+        assert isinstance(result.t, np.ndarray)
+        assert isinstance(result.ys[0], np.ndarray)
+        # output
+        assert len(result.ys) == len(u)
+        assert result.ys[0].shape == (ny, 1)
+        # state
+        assert len(result.xs) == len(u)
+        assert result.xs[0].shape == (nx, 1)
+        # input
+        assert len(result.us) == len(u)
+        assert result.us[0].shape == (nu, 1)
 
 
 def test_linear_continuous_simulator_step_size() -> None:
@@ -57,9 +64,8 @@ def test_linear_continuous_simulator_step_size() -> None:
     step_size = 0.02
     model = Linear(A=A, B=B, C=C, D=D)
     sim = ContinuousSimulator(T=float(len(u) * step_size), step_size=step_size)
-    result, info = sim.simulate(model=model, initial_state=x0, input=u)
+    result = sim.simulate(model=model, initial_state=x0, input=u)
 
-    assert info.success is True
     assert (result.t[2] - result.t[1]) - step_size < 1e-5
 
 
@@ -88,10 +94,9 @@ def test_nonlinear_continuous_simulator() -> None:
         ny=ny,
     )
     sim = ContinuousSimulator(T=float(len(u)))
-    result, info = sim.simulate(model=model, initial_state=x0, input=u)
+    result = sim.simulate(model=model, initial_state=x0, input=u)
 
     assert isinstance(result.ys, List)
-    assert isinstance(info, Dict)
     assert isinstance(result.t, np.ndarray)
     assert isinstance(result.ys[0], np.ndarray)
     # output
@@ -120,9 +125,8 @@ def test_nonlinear_continuous_simulator_step_size() -> None:
         ny=ny,
     )
     sim = ContinuousSimulator(T=float(len(u) * step_size), step_size=step_size)
-    result, info = sim.simulate(model=model, initial_state=x0, input=u)
+    result = sim.simulate(model=model, initial_state=x0, input=u)
 
-    assert info.success is True
     assert (result.t[2] - result.t[1]) - step_size < 1e-5
 
 
@@ -156,20 +160,27 @@ def test_linear_discrete_simulator() -> None:
     step_size = 0.02
 
     sim = DiscreteSimulator(T=float(len(u) * step_size), step_size=step_size)
-    result = sim.simulate(model=model, initial_state=x0, input=u)
+    measurement_noises = (NoiseGeneration('gaussian', 0.0, 0.01), None)
+    for measurement_noise in measurement_noises:
+        result = sim.simulate(
+            model=model,
+            initial_state=x0,
+            input=u,
+            noise_config=measurement_noise,
+        )
 
-    assert isinstance(result.ys, List)
-    assert isinstance(result.t, np.ndarray)
-    assert isinstance(result.ys[0], np.ndarray)
-    # output
-    assert len(result.ys) == len(u)
-    assert result.ys[0].shape == (ny, 1)
-    # state
-    assert len(result.xs) == len(u)
-    assert result.xs[0].shape == (nx, 1)
-    # input
-    assert len(result.us) == len(u)
-    assert result.us[0].shape == (nu, 1)
+        assert isinstance(result.ys, List)
+        assert isinstance(result.t, np.ndarray)
+        assert isinstance(result.ys[0], np.ndarray)
+        # output
+        assert len(result.ys) == len(u)
+        assert result.ys[0].shape == (ny, 1)
+        # state
+        assert len(result.xs) == len(u)
+        assert result.xs[0].shape == (nx, 1)
+        # input
+        assert len(result.us) == len(u)
+        assert result.us[0].shape == (nu, 1)
 
 
 def test_plot_simulation_results() -> None:
@@ -382,3 +393,11 @@ def test_lure() -> None:
 
     assert x1.shape == (2, 1)
     assert y[1].shape == (1, 1)
+
+
+def test_get_noise() -> None:
+    noise_config = NoiseGeneration(type='gaussian', mean=0.0, std=0.01)
+    noise_list = get_noise(size=3, lenght=10, config=noise_config)
+
+    assert noise_list[0].shape == (3, 1)
+    assert len(noise_list) == 10

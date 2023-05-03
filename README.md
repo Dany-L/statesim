@@ -64,7 +64,7 @@ In `scripts/notebooks` some examples of how to use `statesim` are shown in *jupy
 ```json
     {
         "result_directory": "str, Directory where the .csv files will be stored, must exist",
-        "folder_name": "str, Folder name within the result directory, will be created",
+        "base_name": "str, Folder name within the result directory, will be created",
         "seed": "int, a random seed that will be set to numpy",
         "K": "int, Number of samples",
         "T": "float, Simulation end time start is always 0, e.g. [0, T]",

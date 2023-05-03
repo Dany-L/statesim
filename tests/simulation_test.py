@@ -38,7 +38,7 @@ class TestSimulation:
         )
         model = Linear(A=A, B=B, C=np.array([[0, 0, 1, 0]]), D=np.array([[0]]))
         sim = ContinuousSimulator(T=self.T, step_size=self.step_size)
-        result, _ = sim.simulate(
+        result = sim.simulate(
             model=model,
             initial_state=self.x0,
             input=measurements.us,
@@ -66,7 +66,7 @@ class TestSimulation:
             ny=sys.ny,
         )
         sim = ContinuousSimulator(T=self.T, step_size=self.step_size)
-        result, _ = sim.simulate(
+        result = sim.simulate(
             model=model,
             initial_state=self.x0,
             input=measurements.us,

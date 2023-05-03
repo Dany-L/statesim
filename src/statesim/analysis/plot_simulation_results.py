@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import List, Literal
 
-plt.rcParams['text.usetex'] = True
+# plt.rcParams['text.usetex'] = True
 
 
 def plot_states(result: SimulationData) -> None:

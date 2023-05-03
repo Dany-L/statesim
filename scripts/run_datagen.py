@@ -13,107 +13,19 @@ from statesim.configuration import (
     CoupledMsdConfig,
     PendulumConfig,
 )
+from statesim.analysis.plot_simulation_results import plot_outputs
 
 import os
+import argparse
+import pathlib
 import time
 import numpy as np
 from numpy.typing import NDArray
-
-# config = GenerateConfig.parse_obj(
-#     {
-#         'result_directory': '~/cartpole',
-#         'folder_name': 'initial_state_0_K_100_T_20_u_static_random',
-#         'seed': 2023,
-#         'K': 100,
-#         'T': 20,
-#         'step_size': 0.02,
-#         'input': {
-#             'u_max': 10,
-#             'u_min': -10,
-#             'interval_min': 20,
-#             'interval_max': 100,
-#         },
-#         'system': {
-#             'name': 'CartPole',
-#             'nx': 4,
-#             'ny': 1,
-#             'nu': 1,
-#             'C': [0.0, 0.0, 1.0, 0.0],
-#             'xbar': [0.0, 0.0, np.pi, 0.0],
-#             'ubar': [0.0],
-#             'g': 9.81,
-#             'm_c': 1.0,
-#             'm_p': 0.1,
-#             'length': 0.5,
-#             'mu_c': 0.0,
-#             'mu_p': 0.01,
-#         },
-#         'simulator': {'initial_state': [0, 0, 0, 0]},
-#     }
-# )
-# config = GenerateConfig.parse_obj(
-#     {
-#         'result_directory': '~/mass-spring-damper',
-#         'folder_name': 'initial_state_0_K_200_T_30_u_static_random',
-#         'seed': 2023,
-#         'K': 200,
-#         'T': 30,
-#         'step_size': 0.05,
-#         'input': {
-#             'u_max': 4,
-#             'u_min': -4,
-#             'interval_min': 20,
-#             'interval_max': 100,
-#         },
-#         'system': {
-#             'name': 'CoupledMsd',
-#             'nx': 8,
-#             'ny': 1,
-#             'nu': 1,
-#             'C': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-#             'xbar': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-#             'ubar': [0.0],
-#             'N': 4,
-#             'k': [0.25, 0.33, 0.4167, 0.5],
-#             'c': [0.25, 0.33, 0.4167, 0.5],
-#             'm': [1.0, 0.833, 0.67, 0.5]
-#         },
-#         'simulator': {'initial_state': [0, 0, 0, 0, 0, 0, 0, 0]},
-#     }
-# )
-config = GenerateConfig.parse_obj(
-    {
-        'result_directory': '~/pendulum',
-        'folder_name': 'initial_state_0_K_100_T_20_u_static_random',
-        'seed': 2023,
-        'K': 100,
-        'T': 20,
-        'step_size': 0.02,
-        'input': {
-            'u_max': 2,
-            'u_min': -2,
-            'interval_min': 20,
-            'interval_max': 100,
-        },
-        'system': {
-            'name': 'Pendulum',
-            'nx': 2,
-            'ny': 1,
-            'nu': 1,
-            'C': [1.0, 0.0],
-            'xbar': [np.pi, 0.0],
-            'ubar': [0.0],
-            'g': 9.81,
-            'm_p': 0.1,
-            'length': 0.5,
-            'mu_p': 0.01,
-        },
-        'simulator': {'initial_state': [0, 0]},
-    }
-)
+import matplotlib.pyplot as plt
 
 
-if __name__ == "__main__":
+def main(config_file: pathlib.Path):
+    config = GenerateConfig.parse_file(config_file)
     np.random.seed = config.seed
     if isinstance(config.system, CartPoleConfig):
         sys = CartPole(
@@ -151,8 +63,8 @@ if __name__ == "__main__":
             (config.system.nu, 1)
         ),
     )
-    config.system.A = A.tolist()
-    config.system.B = B.tolist()
+    config.system.A = (A * config.step_size + np.eye(A.shape[0])).tolist()
+    config.system.B = (B * config.step_size).tolist()
 
     sim = ContinuousSimulator(T=config.T, step_size=config.step_size)
     model = Nonlinear(
@@ -163,9 +75,11 @@ if __name__ == "__main__":
         ny=config.system.ny,
     )
 
-    assert os.path.isdir(os.path.expanduser(config.result_directory))
+    # assert os.path.isdir(os.path.expanduser(config.result_directory))
     result_directory_path = os.path.join(
-        os.path.expanduser(config.result_directory), config.folder_name, 'raw'
+        os.path.expanduser(config.result_directory),
+        f'{config.base_name}_K-{config.K}_T-{int(config.T)}',
+        'raw',
     )
     os.makedirs(result_directory_path, exist_ok=True)
 
@@ -190,15 +104,35 @@ if __name__ == "__main__":
                 config.input.interval_max,
             ],
         )
-        result, _ = sim.simulate(
+        result = sim.simulate(
             model=model,
             initial_state=np.array(config.simulator.initial_state).reshape(
                 config.system.nx, 1
             ),
             input=us,
+            noise_config=config.measurement_noise,
         )
+        if sample == 1:
+            plot_outputs(result)
+            plt.show()
+
         print(f'{sample}: write csv file: {fullfilename}')
         write_measurement_csv(
             filepath=fullfilename,
             simulation_data=result,
         )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Simulate data for dynamical systems'
+    )
+    parser.add_argument(
+        'system', type=str, help='system name: msd, cartpole, pendulum'
+    )
+
+    args = parser.parse_args()
+    config_file_path = (
+        pathlib.Path.cwd().joinpath('config').joinpath(f'{args.system}.json')
+    )
+    main(config_file=config_file_path)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Union, Literal
 
 
 class SplitConfig(BaseModel):
@@ -58,9 +58,15 @@ class SimulatorConfig(BaseModel):
     method: Optional[str]
 
 
+class NoiseConfig(BaseModel):
+    type: Literal['gaussian']
+    mean: float
+    std: float
+
+
 class GenerateConfig(BaseModel):
     result_directory: str
-    folder_name: str
+    base_name: str
     seed: int
     K: int
     T: float
@@ -68,3 +74,4 @@ class GenerateConfig(BaseModel):
     input: InputConfig
     system: Union[CartPoleConfig, PendulumConfig, CoupledMsdConfig]
     simulator: Optional[SimulatorConfig]
+    measurement_noise: Optional[NoiseConfig]
