@@ -1,0 +1,28 @@
+{
+    "result_directory": "~/linear",
+    "base_name": "DoubleIntegrator",
+    "seed": 2023,
+    "K": 2,
+    "T": 10,
+    "step_size": 0.01,
+    "system": {
+        "name": "StableDoubleIntegrator",
+        "A" : [[0,1], [-1, -1]],
+        "B" : [[0],[1]],
+        "C" : [[1,0]],
+        "D" : [[0]]
+    },
+    "simulator": {"initial_state": [0.0, 0.0]},
+    "measurement_noise": {
+        "type": "gaussian",
+        "mean": 0.0,
+        "std": 0.01
+    },
+    "input_generator": {
+        "type": "random_static_input",
+        "u_max": 1,
+        "u_min": -1,
+        "interval_min": 40,
+        "interval_max": 100
+    }
+}
