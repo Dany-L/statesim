@@ -38,6 +38,12 @@ def main(config_file: GenerateConfig) -> None:
     )
 
     os.makedirs(result_directory_path, exist_ok=True)
+
+    print('Write configuration file')
+    with open(
+        os.path.join(result_directory_path, 'config.json'), mode='w'
+    ) as f:
+        f.write(config.json())
     run_simulation_write_csv_files(
         config=config,
         model=model,

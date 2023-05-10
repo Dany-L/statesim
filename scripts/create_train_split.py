@@ -10,7 +10,7 @@ from pathlib import Path
 
 config = SplitConfig.parse_obj(
     {
-        'raw_data_directory': '/Users/jack/mass-spring-damper/initial_state-0_K-200_T-1000/raw',
+        'raw_data_directory': '~/linear/DoubleIntegrator_K-100_T-10/raw',
         'train_split': 0.6,
         'validation_split': 0.1,
         'seed': 2023,
