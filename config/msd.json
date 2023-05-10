@@ -3,20 +3,21 @@
     "base_name": "initial_state-0",
     "seed": 2023,
     "K": 200,
-    "T": 300,
-    "step_size": 0.05,
-    "input": {
+    "T": 1000,
+    "step_size": 0.5,
+    "input_generator": {
+        "type": "random_static_input",
         "u_max": 0.2,
         "u_min": -0.2,
-        "interval_min": 20,
-        "interval_max": 100
+        "interval_min": 10,
+        "interval_max": 40
     },
     "system": {
         "name": "CoupledMsd",
         "nx": 8,
         "ny": 1,
         "nu": 1,
-        "C": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        "C": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]],
         "xbar": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         "ubar": [0.0],
         "N": 4,
@@ -28,6 +29,6 @@
     "measurement_noise": {
         "type": "gaussian",
         "mean": 0.0,
-        "std": 0.02
+        "std": 0.03
     }
 }

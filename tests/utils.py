@@ -3,6 +3,13 @@ from numpy.typing import NDArray
 import numpy as np
 from statesim.simulator import SimulationData
 from statesim.io import SimulationData
+from statesim.configuration import (
+    GenerateConfig,
+    InputGeneratorConfig,
+    LinearSystemConfig,
+    SimulatorConfig,
+    NoiseConfig,
+)
 import os
 
 DIRNAME = os.path.dirname(__file__)
@@ -16,6 +23,33 @@ A_un = np.array([[0, 1], [0.1, -0.8]])
 B_un = np.array([[0], [1]])
 C_un = np.array([[1, 0]])
 D_un = np.array([[0]])
+
+
+def get_generate_config(result_directory: str) -> GenerateConfig:
+    return GenerateConfig(
+        result_directory=result_directory,
+        base_name='test',
+        seed=2023,
+        K=10,
+        T=5.0,
+        step_size=0.01,
+        input_generator=InputGeneratorConfig(
+            type='random_static_input',
+            u_min=-1.0,
+            u_max=1.0,
+            interval_min=10,
+            interval_max=20,
+        ),
+        system=LinearSystemConfig(
+            name='testSys',
+            A=A.tolist(),
+            B=B.tolist(),
+            C=C.tolist(),
+            D=D.tolist(),
+        ),
+        simulator=SimulatorConfig(initial_state=[1.0, 0.0]),
+        measurement_noise=NoiseConfig(type='gaussian', mean=0.0, std=0.01),
+    )
 
 
 def get_tmp_directory() -> str:
