@@ -15,7 +15,7 @@ class SplitConfig(BaseModel):
 
 
 class InputGeneratorConfig(BaseModel):
-    type: str
+    type: Literal['random_static_input', 'np.sin']
     u_min: float
     u_max: float
     interval_min: float

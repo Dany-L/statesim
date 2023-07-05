@@ -14,7 +14,10 @@ from statesim.configuration import (
     PendulumConfig,
 )
 from statesim.analysis.plot_simulation_results import plot_outputs
-from statesim.utils import run_simulation_write_csv_files
+from statesim.utils import (
+    run_simulation_write_csv_files,
+    get_callable_from_input_config,
+)
 
 import os
 import argparse
@@ -94,6 +97,7 @@ def main(config_file: pathlib.Path):
         model=model,
         sim=sim,
         result_directory_path=result_directory_path,
+        input_generator=get_callable_from_input_config(config.input_generator),
     )
 
 

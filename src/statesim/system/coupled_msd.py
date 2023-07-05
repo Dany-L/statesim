@@ -12,9 +12,9 @@ class CoupledMsd(DynamicSystem):
     def __init__(
         self,
         N: int = 4,
-        k: NDArray[np.float64] = np.array([1 / 4, 1 / 3, 5 / 12, 1 / 2]),
+        k: NDArray[np.float64] = np.array([1.0, 5 / 6, 2 / 3, 1 / 2]),
         c: NDArray[np.float64] = np.array([1 / 4, 1 / 3, 5 / 12, 1 / 2]),
-        m: NDArray[np.float64] = np.array([1.0, 5 / 6, 2 / 3, 1 / 2]),
+        m: NDArray[np.float64] = np.array([1 / 4, 1 / 3, 5 / 12, 1 / 2]),
     ) -> None:
         super().__init__()
         assert N >= 2
@@ -54,7 +54,6 @@ class CoupledMsd(DynamicSystem):
         self._sym_dict['u'] = symbols('u')
         self._state_list.append(self._sym_dict['u'])
         x_dot = self._get_nonlinear_function()
-        x_dot
         self._f_symbol = Matrix([[x_dot_i] for x_dot_i in x_dot])
         self._f = lambdify(
             self._state_list, self._f_symbol.evalf(subs=subs_dict), 'numpy'

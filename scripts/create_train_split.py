@@ -10,7 +10,7 @@ from pathlib import Path
 
 config = SplitConfig.parse_obj(
     {
-        'raw_data_directory': '~/linear/DoubleIntegrator_K-100_T-10/raw',
+        'raw_data_directory': '~/coupled-msd/coupled_msd_initial_state-0_u-15_K-100_T-1200/raw',
         'train_split': 0.6,
         'validation_split': 0.1,
         'seed': 2023,

@@ -1,16 +1,16 @@
 {
-    "result_directory": "~/mass-spring-damper",
-    "base_name": "initial_state-0",
+    "result_directory": "~/coupled-msd",
+    "base_name": "coupled_msd-initial_state-0_u-05",
     "seed": 2023,
-    "K": 200,
+    "K": 100,
     "T": 1000,
-    "step_size": 0.5,
+    "step_size": 0.2,
     "input_generator": {
         "type": "random_static_input",
-        "u_max": 0.2,
-        "u_min": -0.2,
-        "interval_min": 10,
-        "interval_max": 40
+        "u_max": 0.5,
+        "u_min": -0.5,
+        "interval_min": 80,
+        "interval_max": 120
     },
     "system": {
         "name": "CoupledMsd",
@@ -21,9 +21,9 @@
         "xbar": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         "ubar": [0.0],
         "N": 4,
-        "k": [0.25, 0.33, 0.4167, 0.5],
-        "c": [0.25, 0.33, 0.4167, 0.5],
-        "m": [1.0, 0.833, 0.67, 0.5]
+        "m": [0.25, 0.33333, 0.4166667, 0.5],
+        "c": [0.25, 0.33333, 0.4166667, 0.5],
+        "k": [1.0, 0.83333, 0.6666666, 0.5]
     },
     "simulator": {"initial_state": [0, 0, 0, 0, 0, 0, 0, 0]},
     "measurement_noise": {
