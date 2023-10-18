@@ -17,5 +17,5 @@ poetry.lock
 *.mypy_cache
 *.pytest_cache
 # *scripts
-*matlab
+# *matlab
 tests/_tmp

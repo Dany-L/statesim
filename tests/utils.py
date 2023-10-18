@@ -9,6 +9,7 @@ from statesim.configuration import (
     LinearSystemConfig,
     SimulatorConfig,
     NoiseConfig,
+    SplitConfig,
 )
 import os
 
@@ -49,6 +50,7 @@ def get_generate_config(result_directory: str) -> GenerateConfig:
         ),
         simulator=SimulatorConfig(initial_state=[1.0, 0.0]),
         measurement_noise=NoiseConfig(type='gaussian', mean=0.0, std=0.01),
+        split=SplitConfig(train_split=0.6, validation_split=0.2, seed=2023),
     )
 
 

@@ -1,0 +1,15 @@
+
+classdef utils
+
+    methods(Static)
+
+        function L = utils(L_flat, nx)
+            L = zeros(nx,nx);flat_idx = 0;
+            for diag_idx = -0:-1:-nx+1
+                L = L + diag(L_flat(flat_idx+1: flat_idx + diag_idx+nx),diag_idx);
+                diag
+                flat_idx = flat_idx + diag_idx + nx;
+            end
+        end
+    end
+end

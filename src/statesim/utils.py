@@ -12,6 +12,18 @@ from typing import Callable, Optional, Union
 __all__ = ('random_static_input',)
 
 
+def get_data_directory_name(
+    root_directory: pathlib.Path,
+    base_name: str,
+    sequence_count: int,
+    sequence_length: int,
+    raw_directory_name: str,
+) -> pathlib.Path:
+    return root_directory.joinpath(
+        f'{base_name}_K-{sequence_count}_T-{sequence_length}'
+    ).joinpath(raw_directory_name)
+
+
 def run_simulation_write_csv_files(
     config: GenerateConfig,
     model: StateSpaceModel,

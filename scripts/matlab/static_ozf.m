@@ -1,0 +1,311 @@
+clear all, close all
+% analysis of trained hybrid model with doubly hyperdomininant multiplier
+% compare l2 gain to static diagonal multiplier
+
+cal_block_matrix_file_name = './data/HybridCRnn-10-8000000.mat';
+config_file_name = './data/config-HybridCRnn-10-8000000.json';
+data_config_file_name = './data/coupled_msd_initial_state-0_u-15_K-100_T-1200_config.json';
+
+% load trained matrices
+sys_matrices = load(cal_block_matrix_file_name);
+par = sys_matrices.predictor_parameter;
+
+% load configuration
+config = jsondecode(fileread(config_file_name));
+% load data configuration
+data_config = jsondecode(fileread(data_config_file_name));
+
+% load linearized system
+A_lin = config.parameters.A_lin; B_lin=config.parameters.B_lin; C_lin = config.parameters.C_lin;
+
+% size of caligraphic matices
+nx = size(config.parameters.A_lin, 1); ny = nx; nu=nx;
+nwp = size(config.parameters.B_lin, 2);
+nzp = size(config.parameters.C_lin, 1);
+nwu = config.parameters.nwu; nzu = nwu;
+
+%% transformation from controller matrices to interconnected system
+S_s = [A_lin, zeros(nx,nx), B_lin, zeros(nx,nwu);
+    zeros(nx,nx+nx+nwp+nwu);
+    C_lin, zeros(nzp,nx), zeros(nzp,nwp), zeros(nzp,nwu);
+    zeros(nzu, nx+nx+nwp+nwu)];
+S_l = [zeros(nx,nx), A_lin, zeros(nx,nzu);
+    eye(nx), zeros(nx,nx), zeros(nx, nzu);
+    zeros(nzp,nx), C_lin, zeros(nzp,nzu);
+    zeros(nzu,nx), zeros(nzu,nx), eye(nzu)];
+S_r = [zeros(nx,nx), eye(nx), zeros(nx,nwp), zeros(nx, nwu);
+    zeros(nwp,nx), zeros(nwp,nx), eye(nwp), zeros(nwp, nwu);
+    eye(nx), zeros(nx,nx), zeros(nx,nwp), zeros(nx,nwu);
+    zeros(nwu, nx), zeros(nwu, nx), zeros(nwu,nwp), eye(nwu)];
+
+P_bold = S_s + S_l * sys_matrices.omega * S_r;
+
+A_cal = P_bold(1:nx*2, 1:nx*2);
+B1_cal = P_bold(1:nx*2, nx*2+1:nx*2+nwp);
+B2_cal = P_bold(1:nx*2, nx*2+1+nwp:end);
+
+C1_cal = P_bold(nx*2+1: nx*2+nzp, 1:nx*2);
+D11_cal = P_bold(nx*2+1:nx*2+nzp, nx*2+1:nx*2+nwp);
+D12_cal = P_bold(nx*2+1:nx*2+nzp, nx*2+1+nwp:end);
+
+C2_cal = P_bold(nx*2+nzp+1:end, 1:nx*2);
+D21_cal = P_bold(nx*2+nzp+1:end, nx*2+1:nx*2+nwp);
+D22_cal = P_bold(nx*2+nzp+1:end, nx*2+1+nwp:end);
+
+%% Multiplier
+a=-1;b=1;
+P_r = [b*eye(nwu) -eye(nwu);-a*eye(nwu) eye(nwu)];
+lambda = sdpvar(nwu,1);
+
+% Diagonal
+L = diag(lambda);
+
+% % Static ZF
+% L = sdpvar(nwu, nwu, 'full');
+% multiplier_constraint = [ones(nwu, 1)' * L >= 0; L * ones(nwu, 1) >= 0];
+% for i = 1 : nwu
+%    for j = 1 : nwu
+%        if i ~= j
+%            multiplier_constraint = [multiplier_constraint; L(i, j) <= 0];
+%        end
+%    end
+% end
+
+P = P_r' * [zeros(nwu,nwu), L'; L, zeros(nwu,nwu)] * P_r;
+
+%% Lur'e system
+L1 = [A_cal, B1_cal, B2_cal;
+    eye(2*nx), zeros(2*nx, nwp), zeros(2*nx, nwu)];
+L2 = [C1_cal, D11_cal, D12_cal;
+    zeros(nwp, nx*2), eye(nwp), zeros(nwp, nwu)];
+L3 = [C2_cal, D21_cal, D22_cal;
+    zeros(nzu, nx*2), zeros(nzu, nwp), eye(nwu)];
+
+% SDP for optimal energy gain
+X_cal = sdpvar(2*nx,2*nx);
+ga = sdpvar(1,1);
+
+eps=1e-5;
+
+lmis = [];
+lmi = L1' * [X_cal, zeros(2*nx,2*nx); zeros(2*nx,2*nx), -X_cal] * L1 + ...
+    L2' * [eye(nwp), zeros(nwp,nzp); zeros(nzp,nwp), -ga*eye(nzp)] * L2 + ...
+    L3' * P * L3;
+
+lmis = lmis + (lmi <= -eps * eye(size(L1,2)));
+lmis = lmis + (X_cal >= 0);
+% lmis = lmis + (ones(1,nwu)* L >= eps);
+% lmis = lmis + (L*ones(nwu,1) >= eps);
+% lmis = lmis + multiplier_constraint;
+
+optimize(lmis, ga, sdpsettings('solver','MOSEK','verbose', 0))
+checkset(lmis)
+sqrt(double(ga))
+
+%% build interconnected system
+
+% linear system
+sys = dss(A_lin,[B_lin, A_lin], [C_lin; eye(nx)], [zeros(nzp,nwp), C_lin;zeros(ny,nwp), zeros(ny,nu)],eye(nx),config.parameters.time_delta);
+input_names_cell = cell(nwp+nu,1);
+idx = 1;
+for input_sys_idx =1:nwp
+    input_names_cell{input_sys_idx} = ['wp_', num2str(idx)];
+    idx=idx+1;
+end
+idx = 1;
+for input_sys_idx = nwp+1:nwp+nu
+    input_names_cell{input_sys_idx} = ['u_', num2str(idx)];
+    idx=idx+1;
+end
+sys.InputName = input_names_cell;
+
+output_names_cell = cell(nzp+ny,1);
+idx = 1;
+for output_sys_idx = 1:nzp
+    output_names_cell{output_sys_idx} = ['zp_', num2str(idx)];
+    idx=idx+1;
+end
+idx = 1;
+for output_sys_idx = nzp+1:nzp+ny
+    output_names_cell{output_sys_idx} = ['y_', num2str(idx)];
+    idx=idx+1;
+end
+sys.OutputName = output_names_cell;
+
+% controller
+omega = sys_matrices.omega;
+A_c = omega(1:nx, 1:nx);
+B1_c = omega(1:nx, nx+1:nx+nwp+ny);
+B2_c = omega(1:nx, nx+nwp+ny+1:end);
+C1_c = omega(nx+1:nx+nu, 1:nx);
+D11_c = omega(nx+1:nx+nu, nx+1:nx+nwp+ny);
+D12_c = omega(nx+1:nx+nu, nx+nwp+ny+1:end);
+C2_c = omega(nx+nu+1:end, 1:nx);
+D21_c = omega(nx+nu+1:end, nx+1:nx+nwp+ny);
+D22_c = omega(nx+nu+1:end, nx+nwp+ny+1:end);
+
+con = dss(A_c,[B1_c B2_c], [C1_c;C2_c], [D11_c, D12_c; D21_c, D22_c], eye(nx), config.parameters.time_delta);
+input_names_cell = cell(nwp+ny+nwu,1);
+idx = 1;
+for input_c_idx =1:nwp
+    input_names_cell{input_c_idx} = ['wp_', num2str(idx)];
+    idx=idx+1;
+end
+idx = 1;
+for input_c_idx =nwp+1:nwp+ny
+    input_names_cell{input_c_idx} = ['y_', num2str(idx)];
+    idx=idx+1;
+end
+idx = 1;
+for input_c_idx =nwp+ny+1:nwp+ny+nwu
+    input_names_cell{input_c_idx} = ['wu_', num2str(idx)];
+    idx=idx+1;
+end
+con.InputName = input_names_cell;
+
+output_names_cell = cell(nu+nwu,1);
+idx = 1;
+for output_c_idx = 1:nu
+    output_names_cell{output_c_idx} = ['u_', num2str(idx)];
+    idx = idx +1;
+end
+idx = 1;
+for output_c_idx = nu+1:nu+nzu
+    output_names_cell{output_c_idx} = ['zu_', num2str(idx)];
+    idx = idx +1;
+end
+con.OutputName = output_names_cell;
+
+% Parametric uncertainties
+for i = 1 : nwu
+	del(i) = ureal(['wu_', num2str(i)], 0, 'Range', [-1, 1]);
+end
+
+% nonlinear controller
+nl_con = lft(con,diag(del));
+
+% closed loop
+cl = connect(nl_con, sys, 'wp_1', 'zp_1');
+
+%% hybrid model directly from lure matrices
+
+hyb = dss(A_cal, [B1_cal, B2_cal], [C1_cal;C2_cal],[D11_cal, D12_cal;D21_cal,D22_cal], eye(2*nx), config.parameters.time_delta );
+output_names_cell = cell(nzu+nzp,1);
+output_names_cell{1} = 'zp_1';
+idx = 1;
+for out_name_idx = nzp+1:nzp+nzu
+    output_names_cell{out_name_idx} = ['zu_' num2str(idx)];
+    idx = idx+1;
+end
+hyb.OutputName = output_names_cell;
+
+input_names_cell = cell(nwp+nzp,1);
+input_names_cell{1} = 'wp_1';
+idx = 1;
+for input_name_idx = nwp+1:nwp+nwu
+    input_names_cell{input_name_idx} = ['wu_' num2str(idx)];
+    idx = idx+1;
+end
+hyb.InputName = input_names_cell;
+ 
+%% Test different parametric uncertainties
+
+% Parametric uncertainties
+for i = 1 : nwu
+	del(i) = ureal(['wu_', num2str(i)], 0, 'Range', [-1, 1]);
+end
+
+% show nominal values
+figure(), hold on
+gains = 1; num = length(gains);
+legend_cell = cell(num,1);
+for idx=1:num
+    cl_hyb = lft(hyb, gains(idx) * diag(del));
+    bodemag(cl_hyb)
+    legend_cell{idx} = ['$\Delta *', num2str(gains(idx)), '$'];
+end
+legend(legend_cell, 'interpreter','latex', 'fontsize', 18), grid on
+%% linear system
+lin = dss(A_lin,B_lin,C_lin,0,eye(nx),config.parameters.time_delta);
+
+
+%% time domain
+% T = config.parameters.sequence_length(end);
+T = 1000;
+t = 0:config.parameters.time_delta:T';
+N = length(t);
+
+input_config = data_config.input_generator;
+u_max = input_config.u_max; u_min = input_config.u_min;
+T_min = input_config.interval_min; T_max = input_config.interval_max;
+
+% input signal
+u = zeros(N,1);
+k_start = 1;k_end = 1;
+while k_end < N
+    k_end = k_start + randi([T_min, T_max],1);
+    amplitude = u_min + (u_max - u_min).*rand(1,1);
+    u(k_start:k_end)=amplitude;
+    k_start=k_end;
+end
+u = u(1:N);
+
+y_hyb_lin = lsim(cl_hyb.NominalValue,u,t);
+y_lin = lsim(lin,u,t);
+
+
+%% simulate nonlinear system (with activation function)
+
+activation.ReLU = 1;
+activation.Tanh = 2;
+activation.None = 3;
+
+name_list = {'ReLU', 'None'};
+figure(), hold on, grid on
+for i =1:length(name_list)
+    nonlinearity = activation.(name_list{i});
+    u_ts = timeseries(u,t);
+    out = sim('non_lin.slx');
+    plot(out.zp_ts, 'linewidth',2)
+end
+
+% simulate true system
+sys_par = data_config.system;
+x0 = data_config.simulator.initial_state;
+true_out = sim('coupled_msd_4.slx');
+plot(true_out.y_true, '--', 'linewidth', 2)
+name_list{end+1} = 'true';
+
+% linear system
+name_list{end+1} = 'lin';
+plot(t,y_lin, 'linewidth',2)
+
+legend(name_list,'interpreter','latex','fontsize',16)
+
+
+
+%%
+plot(t, y_hyb_lin); hold on, grid on
+plot(t, y_lin);
+plot(y_hyb_nonlin); legend('hyb lin', 'lin', 'hyb non lin', 'interpreter', 'latex','fontsize',16)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

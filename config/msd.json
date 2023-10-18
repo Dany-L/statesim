@@ -1,16 +1,16 @@
 {
     "result_directory": "~/coupled-msd",
-    "base_name": "coupled_msd-initial_state-0_u-05",
+    "base_name": "coupled_msd-initial_state-0_u-10_f-120-160",
     "seed": 2023,
-    "K": 100,
-    "T": 1000,
+    "K": 50,
+    "T": 1200,
     "step_size": 0.2,
     "input_generator": {
         "type": "random_static_input",
-        "u_max": 0.5,
-        "u_min": -0.5,
-        "interval_min": 80,
-        "interval_max": 120
+        "u_max": 1,
+        "u_min": -1,
+        "interval_min": 120,
+        "interval_max": 160
     },
     "system": {
         "name": "CoupledMsd",
@@ -30,5 +30,10 @@
         "type": "gaussian",
         "mean": 0.0,
         "std": 0.03
+    },
+    "split": {
+        "train_split": 0.0,
+        "validation_split": 0.0,
+        "seed": 2023
     }
 }

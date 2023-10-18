@@ -17,6 +17,7 @@ from statesim.analysis.plot_simulation_results import plot_outputs
 from statesim.utils import (
     run_simulation_write_csv_files,
     get_callable_from_input_config,
+    get_data_directory_name,
 )
 
 import os
@@ -79,9 +80,11 @@ def main(config_file: pathlib.Path):
         ny=config.system.ny,
     )
 
-    result_directory_path = os.path.join(
-        os.path.expanduser(config.result_directory),
-        f'{config.base_name}_K-{config.K}_T-{int(config.T)}',
+    result_directory_path = get_data_directory_name(
+        pathlib.Path(os.path.expanduser(config.result_directory)),
+        config.base_name,
+        config.K,
+        int(config.T),
         'raw',
     )
     os.makedirs(result_directory_path, exist_ok=True)

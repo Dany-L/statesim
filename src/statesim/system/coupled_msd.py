@@ -62,7 +62,7 @@ class CoupledMsd(DynamicSystem):
     def _get_nonlinear_function(self) -> List[sym.core.add.Add]:
         def Gamma(d):
             return Piecewise(
-                (d - 0.75, d <= -1), (0.25 * d, d < 1), (d + 0.75, True)
+                (d + 0.75, d <= -1), (0.25 * d, d < 1), (d - 0.75, True)
             )
 
         x_dot = []

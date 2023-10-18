@@ -6,7 +6,6 @@ CSV_FILE_NAME = 'simulation'
 
 
 class SplitConfig(BaseModel):
-    raw_data_directory: str
     train_split: float
     validation_split: float
     seed: int
@@ -92,3 +91,4 @@ class GenerateConfig(BaseModel):
     ]
     simulator: Optional[SimulatorConfig]
     measurement_noise: Optional[NoiseConfig]
+    split: SplitConfig
