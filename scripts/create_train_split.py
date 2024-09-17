@@ -80,6 +80,9 @@ if __name__ == "__main__":
     raw_data_directory = get_data_directory_name(
         Path(os.path.expanduser(config.result_directory)),
         config.base_name,
+        config.input_generator.u_max,
+        int(config.input_generator.interval_min),
+        int(config.input_generator.interval_max),
         config.K,
         int(config.T),
         'raw',

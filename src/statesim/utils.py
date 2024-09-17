@@ -15,12 +15,15 @@ __all__ = ('random_static_input',)
 def get_data_directory_name(
     root_directory: pathlib.Path,
     base_name: str,
+    u_max: float,
+    f_min: int,
+    f_max: int,
     sequence_count: int,
     sequence_length: int,
     raw_directory_name: str,
 ) -> pathlib.Path:
     return root_directory.joinpath(
-        f'{base_name}_K-{sequence_count}_T-{sequence_length}'
+        f'{base_name}_u-{str(u_max).replace(".","")}_f-{f_min}-{f_max}_K-{sequence_count}_T-{sequence_length}'
     ).joinpath(raw_directory_name)
 
 
