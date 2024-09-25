@@ -38,7 +38,7 @@ class Pendulum(DynamicSystem):
 
     def _get_nonlinear_function(self) -> List[sym.core.add.Add]:
         x1_dot = self._x2
-        x2_dot = (-self._k * sin(self._x1) + self._u)
+        x2_dot = (-self._k * sin(self._x1) -1/100*self._x2 + self._u)
         return [x1_dot, x2_dot]
 
     def state_dynamics(self, x, u):
