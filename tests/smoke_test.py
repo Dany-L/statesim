@@ -9,7 +9,7 @@ from statesim.analysis.plot_simulation_results import (
 from statesim.noise import get_noise, NoiseGeneration
 from statesim.analysis.system_analysis import SystemAnalysisContinuous
 from statesim.system.cartpole import CartPole
-from statesim.system.inverted_pendulum import InvertedPendulum
+from statesim.system.pendulum import InvertedPendulum
 from statesim.system.coupled_msd import CoupledMsd
 from statesim.io import (
     read_measurement_csv,

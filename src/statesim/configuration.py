@@ -14,11 +14,17 @@ class SplitConfig(BaseModel):
 
 
 class InputGeneratorConfig(BaseModel):
-    type: Literal['random_static_input', 'np.sin']
+    type: Literal['random_static_input', 'np.sin', 'gaussian_random_field']
+
+class RandomStaticInputConfig(InputGeneratorConfig):
     u_min: float
     u_max: float
     interval_min: float
     interval_max: float
+
+class GaussianRandomFieldInputConfig(InputGeneratorConfig):
+    l: float
+    s: float
 
 
 class LinearSystemConfig(BaseModel):
@@ -82,10 +88,10 @@ class GenerateConfig(BaseModel):
     result_directory: str
     base_name: str
     seed: int
-    K: int
+    M: int
     T: float
     step_size: float
-    input_generator: Optional[InputGeneratorConfig]
+    input_generator: Optional[Union[GaussianRandomFieldInputConfig, RandomStaticInputConfig]]
     system: Union[
         LinearSystemConfig, CartPoleConfig, PendulumConfig, CoupledMsdConfig
     ]

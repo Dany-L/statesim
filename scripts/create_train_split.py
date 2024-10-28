@@ -68,7 +68,7 @@ if __name__ == "__main__":
         description='Create train, test and validation split of generated data'
     )
     parser.add_argument(
-        'system', type=str, help='system name: msd, cartpole, pendulum'
+        'system', type=str, help='system name: msd, cartpole, actuated_pendulum, inverted_pendulum'
     )
 
     args = parser.parse_args()
@@ -80,10 +80,7 @@ if __name__ == "__main__":
     raw_data_directory = get_data_directory_name(
         Path(os.path.expanduser(config.result_directory)),
         config.base_name,
-        config.input_generator.u_max,
-        int(config.input_generator.interval_min),
-        int(config.input_generator.interval_max),
-        config.K,
+        config.M,
         int(config.T),
         'raw',
     )

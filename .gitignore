@@ -19,3 +19,4 @@ poetry.lock
 # *scripts
 # *matlab
 tests/_tmp
+playground.py

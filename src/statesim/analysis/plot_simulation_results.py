@@ -77,6 +77,6 @@ def plot_comparison(
                     ]
                 ),
             )
-            ax.set_title(f'${type[:-1]}_{element+1}$')
+            ax.set_title(f'Error of ${type[:-1]}_{element+1}$')
             ax.legend()
             ax.grid()

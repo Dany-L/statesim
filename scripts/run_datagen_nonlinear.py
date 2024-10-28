@@ -1,11 +1,7 @@
 from statesim.simulator import ContinuousSimulator
-from statesim.io import (
-    write_measurement_csv,
-)
-from statesim.generate.input import random_static_input
 from statesim.system.cartpole import CartPole
 from statesim.system.coupled_msd import CoupledMsd
-from statesim.system.inverted_pendulum import InvertedPendulum
+from statesim.system.pendulum import InvertedPendulum, ActuatedPendulum
 from statesim.model.statespace import Nonlinear
 from statesim.configuration import (
     GenerateConfig,
@@ -13,7 +9,6 @@ from statesim.configuration import (
     CoupledMsdConfig,
     PendulumConfig,
 )
-from statesim.analysis.plot_simulation_results import plot_outputs
 from statesim.utils import (
     run_simulation_write_csv_files,
     get_callable_from_input_config,
@@ -49,6 +44,23 @@ def main(config_file: pathlib.Path):
             m=config.system.m,
         )
     elif isinstance(config.system, PendulumConfig):
+        if 'Actuated' in config.system.name:
+            sys = ActuatedPendulum(
+                g=config.system.g,
+                m_p=config.system.m_p,
+                length=config.system.length,
+                mu_p=config.system.mu_p,
+            )
+        elif 'Inverted' in config.system.name:
+            sys = InvertedPendulum(
+                g=config.system.g,
+                m_p=config.system.m_p,
+                length=config.system.length,
+                mu_p=config.system.mu_p,
+            )
+        else:
+            raise NotImplementedError
+    elif isinstance(config.system, PendulumConfig):
         sys = InvertedPendulum(
             g=config.system.g,
             m_p=config.system.m_p,
@@ -83,10 +95,7 @@ def main(config_file: pathlib.Path):
     result_directory_path = get_data_directory_name(
         pathlib.Path(os.path.expanduser(config.result_directory)),
         config.base_name,
-        config.input_generator.u_max,
-        int(config.input_generator.interval_min),
-        int(config.input_generator.interval_max),
-        config.K,
+        config.M,
         int(config.T),
         'raw',
     )
@@ -112,7 +121,7 @@ if __name__ == "__main__":
         description='Simulate data for dynamical systems'
     )
     parser.add_argument(
-        'system', type=str, help='system name: msd, cartpole, pendulum'
+        'system', type=str, help='system name: msd, cartpole, actuated_pendulum, inverted_pendulum'
     )
 
     args = parser.parse_args()
